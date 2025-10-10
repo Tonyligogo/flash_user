@@ -1,13 +1,34 @@
-import { Keyboard, KeyboardAvoidingView, Platform, TextInput, TouchableWithoutFeedback, View} from "react-native";
+import { Keyboard, KeyboardAvoidingView, Platform, StyleSheet, TextInput, TouchableWithoutFeedback, View} from "react-native";
 
-import { icons } from "@/constants";
-import { GoogleInputProps } from "@/types/type";
-import InputField from "./input-field";
+import { ColorPalette, GoogleInputProps } from "@/types/type";
 import { useState } from "react";
-import { ThemedText } from "./themed-text";
-import { ThemedView } from "./themed-view";
 import { Image } from "expo-image";
 import COLORS from "@/constants/Colors";
+import { useTheme } from "@/constants/ThemeContext";
+
+const createStyles = (colors: ColorPalette) => StyleSheet.create({
+  wrapper:{
+    marginVertical:16,
+    width:'100%'
+  },
+  container:{
+    flexDirection: "row", 
+    alignItems: "center", 
+    overflow:'hidden',
+    backgroundColor: colors.tripCardBig,
+  },
+  icon:{
+    width: 24, 
+    height: 24, 
+    marginLeft: 16
+  },
+  textInput:{
+    padding: 16, 
+    fontSize: 18, 
+    borderRadius: 50,
+    color:colors.textPrimary
+  }
+});
 
 const GoogleTextInput = ({
   icon,
@@ -15,22 +36,24 @@ const GoogleTextInput = ({
   handlePress,
 }: GoogleInputProps) => {
   const [searchQuery, setSearchQuery] = useState("");
+  const { colors } = useTheme();
+    const themedStyles = createStyles(colors);
   return (
     <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"}>
           <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-            <View style={{ marginVertical: 16, width: "100%" }}>
-              <ThemedView
-                style={{ flexDirection: "row", alignItems: "center", borderRadius: 50 }}
+            <View style={themedStyles.wrapper}>
+              <View
+                style={[themedStyles.container, {borderRadius:50}]}
               >
-                {icon && <Image source={icon} style={{ width: 24, height: 24, marginLeft: 16 }} />}
+                {icon && <Image source={icon} style={themedStyles.icon} />}
                 <TextInput
-                  style={{ padding: 16, fontSize: 18, borderRadius: 50, color:'white' }}
+                  style={themedStyles.textInput}
                   placeholder="e.g. Meru town"
                   placeholderTextColor={COLORS.textGray}
                   value={searchQuery}
                   onChangeText={(text) => setSearchQuery(text)}
                 />
-              </ThemedView>
+              </View>
             </View>
           </TouchableWithoutFeedback>
         </KeyboardAvoidingView>

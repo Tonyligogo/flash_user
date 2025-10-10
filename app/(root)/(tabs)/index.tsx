@@ -6,7 +6,6 @@ import GoogleTextInput from '@/components/GoogleTextInput'
 import { useLocationStore } from '@/store'
 import * as Location from 'expo-location';
 import Map from '@/components/Map'
-import { ThemedText } from '@/components/themed-text'
 import { ColorPalette } from '@/types/type'
 import { useTheme } from '@/constants/ThemeContext'
 
@@ -41,12 +40,13 @@ const createStyles = (colors: ColorPalette) => StyleSheet.create({
   },
   greeting: {
     fontSize: 24,
+    marginBottom:8
   },
   subtitle: {
     fontSize: 16,
   },
   helpButtonContainer: {
-    backgroundColor: colors.card,
+    backgroundColor: colors.tripCardBig,
     width: 38,
     height: 38,
     borderRadius: 19,
@@ -72,7 +72,7 @@ const createStyles = (colors: ColorPalette) => StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 5,
-    backgroundColor: colors.tripCardSmall,
+    backgroundColor: colors.tripCardBig,
     padding: 16,
     borderRadius: 16,
   },
@@ -172,8 +172,8 @@ const Index = () => {
             <View style={themedStyles.userInfo}>
               <Image source={images.userLogo} style={themedStyles.userLogo} />
               <View>
-                <ThemedText style={[themedStyles.greeting, { marginBottom: 8 }]}>Tony Ligogo 👋</ThemedText>
-                <ThemedText style={[themedStyles.subtitle, { color: colors.textSecondary }]}>Go anywhere, right now</ThemedText>
+                <Text style={[themedStyles.greeting, { color: colors.textPrimary }]}>Tony Ligogo 👋</Text>
+                <Text style={[themedStyles.subtitle, { color: colors.textSecondary }]}>Go anywhere, right now</Text>
               </View>
             </View>
             {/* Help Button */}
@@ -188,41 +188,29 @@ const Index = () => {
             textInputBackgroundColor={colors.card}
             handlePress={handleDestinationSearch}
           />
-
-          {/* Destination Cards Section */}
           <View style={themedStyles.cardsContainer}>
-            {/* Top Row */}
             <View style={themedStyles.cardRow}>
-              {/* New Trip Card - Background themed */}
               <View style={themedStyles.newTripCard}>
                 <Text style={themedStyles.cardEmoji}>🚗</Text>
                 <Text style={themedStyles.cardSmallTitle}>New Trip</Text>
               </View>
-              {/* Home Card - Background themed (Accent) */}
               <View style={themedStyles.homeCard}>
                 <View style={themedStyles.cardTextContent}>
-                  {/* Title color is handled by themedStyles.cardLargeTitle (set to white) */}
                   <Text style={themedStyles.cardLargeTitle}>Home</Text>
-                  {/* Subtitle color uses a tertiary themed color for low contrast on accent */}
-                  <Text style={[themedStyles.cardSubtitle, { color: colors.background }]}>Zimmerman, Roysambu</Text>
+                  <Text style={[themedStyles.cardSubtitle, { color: colors.textSecondary }]}>Zimmerman, Roysambu</Text>
                 </View>
                 <Text style={themedStyles.cardLargeEmoji}>🏠</Text>
               </View>
             </View>
 
-            {/* Bottom Row */}
             <View style={themedStyles.cardRow}>
-              {/* School Card - Background themed (Accent) */}
               <View style={[themedStyles.homeCard, { paddingLeft: 0, paddingRight: 16 }]}>
                 <Text style={themedStyles.cardLargeEmoji}>🏫</Text>
                 <View style={themedStyles.cardTextContent}>
-                  {/* Title color is handled by themedStyles.cardLargeTitle (set to white) */}
                   <Text style={themedStyles.cardLargeTitle}>School</Text>
-                  {/* Subtitle color uses a tertiary themed color */}
-                  <Text style={[themedStyles.cardSubtitle, { color: colors.background }]}>Kenyatta University</Text>
+                  <Text style={[themedStyles.cardSubtitle, { color: colors.textSecondary }]}>Kenyatta University</Text>
                 </View>
               </View>
-              {/* Office Card - Background themed */}
               <View style={themedStyles.newTripCard}>
                 <Text style={themedStyles.cardEmoji}>💼</Text>
                 <Text style={themedStyles.cardSmallTitle}>Office</Text>
@@ -232,14 +220,11 @@ const Index = () => {
 
           {/* Location Map Section */}
           <View>
-            {/* Map Title uses ThemedText */}
-            <ThemedText style={[themedStyles.mapTitle, { marginTop: 8, marginBottom: 4 }]}>Your Current Location</ThemedText>
-            {/* Text color changed */}
-            <ThemedText style={{ color: colors.textSecondary }}>
+            <Text style={{ color: colors.textSecondary }}>
               {!hasPermissions && 'Please allow Flash to access your location'}
-            </ThemedText>
+            </Text>
             <View style={themedStyles.mapContainer}>
-              {/* <Map /> */}
+              <Map />
             </View>
           </View>
         </View>

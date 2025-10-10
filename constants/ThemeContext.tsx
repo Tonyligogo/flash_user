@@ -2,14 +2,12 @@ import { ColorPalette } from '@/types/type';
 import React, { createContext, useContext, ReactNode, useState, useMemo } from 'react';
 import { useColorScheme } from 'react-native';
 
-// --- TYPES (Assuming these exist in '@/types/type') ---
-// Re-defining them here for context completeness
 export type ThemeMode = 'light' | 'dark' | 'system';
 
 export interface ThemeContextType {
     isDark: boolean;
     colors: ColorPalette;
-    theme: ThemeMode; // Added state for user-selected theme
+    theme: ThemeMode; //user-selected theme
     setTheme: (mode: ThemeMode) => void; // Added function to change theme
 }
 
@@ -20,7 +18,7 @@ const lightColors: ColorPalette = {
     background: '#F8F8F8',
     card: '#FFFFFF',
     tripCardSmall: '#1F1F1F',
-    tripCardBig: '#e5e5e5',
+    tripCardBig: '#ececec',
     textPrimary: '#1F1F1F',
     textSecondary: '#666666',
     border: '#EAEAEA',
@@ -55,8 +53,6 @@ const darkColors: ColorPalette = {
     warningBackground: '#FFF1F0',
     success: '#66bb6a',
 };
-
-// --- CONTEXT SETUP ---
 
 // Define a default context value (will be overwritten by Provider)
 const defaultThemeContext: ThemeContextType = {
