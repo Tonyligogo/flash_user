@@ -12,7 +12,9 @@ import { ColorPalette } from '@/types/type';
 import { useTheme } from '@/constants/ThemeContext';
 import SupportLayout from '@/components/support-layout';
 
-const CommonStyles = (colors: ColorPalette) => ({
+// --- MOCK DRIVER INFO ---
+const DRIVER_NAME = "Peter Kimore.";
+const CommonStyles = (colors: ColorPalette) => StyleSheet.create({
     card: {
         padding: 18,
         borderRadius: 12,
@@ -47,9 +49,6 @@ const CommonStyles = (colors: ColorPalette) => ({
         fontWeight: 'bold',
     },
 });
-
-// --- MOCK DRIVER INFO ---
-const DRIVER_NAME = "Peter Kimore.";
 
 // --- TAGS FOR FEEDBACK ---
 const POSITIVE_TAGS = ["Great Music", "Clean Car", "Smooth Driving", "Friendly Service"];

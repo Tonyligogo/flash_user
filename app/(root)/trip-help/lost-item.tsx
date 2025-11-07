@@ -115,7 +115,7 @@ const LostItemScreen: React.FC = () => {
     );
 };
 
-const CommonStyles = (colors: ColorPalette) => ({
+const CommonStyles = (colors: ColorPalette) => StyleSheet.create ({
     card: {
         padding: 18,
         borderRadius: 12,

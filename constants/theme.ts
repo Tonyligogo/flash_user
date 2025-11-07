@@ -17,15 +17,19 @@ export const Colors = {
     icon: '#687076',
     tabIconDefault: '#687076',
     tabIconSelected: tintColorLight,
+    textSecondary:"#OAOAOA",
+    primary: '#0286FF',
   },
   dark: {
     text: '#ECEDEE',
+    textSecondary:"#666666",
     background: '#151718',
     tint: tintColorDark,
     borders: '#151718',
     icon: '#9BA1A6',
     tabIconDefault: '#9BA1A6',
     tabIconSelected: tintColorDark,
+    primary: '#0286FF',
   },
 };
 

@@ -1,20 +1,19 @@
+import { ThemedText } from '@/components/themed-text';
+import { ThemedTouchableOpacity } from '@/components/themed-view';
 import { useTheme } from '@/constants/ThemeContext';
 import { ColorPalette } from '@/types/type';
-import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
   View,
-  Text,
   ScrollView,
-  StatusBar,
   StyleSheet,
-  TouchableOpacity,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import RideDetails from '../(screens)/ride-details';
 
 
 // --- TYPE DEFINITIONS FOR RIDES ---
-interface Ride {
+export interface Ride {
   id: string;
   date: string;
   time: string;
@@ -65,178 +64,100 @@ const mockRides: Ride[] = [
     distance: 4.1,
     duration: 15,
   },
+  {
+    id: 'RIDE-1004',
+    date: 'Sep 30, 2025',
+    time: '7:10 PM',
+    driver: 'Peter K.',
+    car: 'Subaru Impreza (KCA 456X)',
+    cost: 1280.00,
+    pickup: 'CBD, Nairobi',
+    destination: 'Jomo Kenyatta International Airport',
+    distance: 18.2,
+    duration: 55,
+  },
+  {
+    id: 'RIDE-1005',
+    date: 'Sep 29, 2025',
+    time: '1:30 PM',
+    driver: 'Ann M.',
+    car: 'Suzuki Swift (KDE 789A)',
+    cost: 320.50,
+    pickup: 'Thika Road Mall',
+    destination: 'Pana Heights Apartment',
+    distance: 4.1,
+    duration: 15,
+  },
 ];
-
-// --- ICON PLACEHOLDER ---
-const Icon = ({ name, color }: { name: string; color: string }) => {
-  const emojiMap: { [key: string]: string } = {
-    'car': '🚗',
-    'dot': '⚫',
-    'square': '◼️',
-    'back': '❮',
-    'location': '📍',
-    'clock': '🕒',
-    'money': '💰'
-  };
-  return <Text style={{ fontSize: 20, color: color }}>{emojiMap[name] || '?'}</Text>;
-};
 
 // --- MAIN COMPONENT ---
 const Rides: React.FC = () => {
   const { colors } = useTheme();
   const themedStyles = styles(colors);
-  const router = useRouter();
-
-  // State to manage the selected ride for detail view
   const [selectedRide, setSelectedRide] = useState<Ride | null>(null);
-  const handleSupportButtonPress = (ride: Ride) => {
-    const rideJson = JSON.stringify(ride);
-    router.push({
-      pathname: "/(root)/trip-help/main-details",
-      params: { 
-          rideDetails: rideJson,
-      }, 
-    });
-  };
   // --- RENDERERS ---
-
   const renderRideItem = (ride: Ride) => (
-    <TouchableOpacity
-      key={ride.id}
-      style={[themedStyles.rideCard, { backgroundColor: colors.card, borderColor: colors.border }]}
-      onPress={() => setSelectedRide(ride)}
-    >
-      <View style={themedStyles.rideCardHeader}>
-        <Icon name="car" color={colors.accent} />
-        <View style={themedStyles.rideCardTitleContainer}>
-          <Text style={[themedStyles.rideDate, { color: colors.textPrimary }]}>
-            {ride.date}
-          </Text>
-          <Text style={[themedStyles.rideCost, { color: colors.textPrimary }]}>
-            KSh {ride.cost.toFixed(2)}
-          </Text>
-        </View>
-      </View>
-      
-      <View style={themedStyles.locationDetail}>
-        <View style={themedStyles.locationPins}>
-          <Icon name="dot" color={colors.accent} />
-          <View style={themedStyles.verticalLine} />
-          <Icon name="square" color={colors.textPrimary} />
-        </View>
-        <View style={themedStyles.locationText}>
-          <Text style={[themedStyles.locationTextPrimary, { color: colors.textPrimary }]}>
-            {ride.pickup}
-          </Text>
-          <Text style={[themedStyles.locationTextSecondary, { color: colors.textSecondary }]}>
-            {ride.destination}
-          </Text>
-        </View>
-      </View>
-    </TouchableOpacity>
-  );
-
-  const renderRideDetail = (ride: Ride) => (
-    <ScrollView 
-        style={themedStyles.detailScrollView} 
-        contentContainerStyle={themedStyles.detailContent}
-    >
-        <TouchableOpacity 
-            style={themedStyles.backButton} 
-            onPress={() => setSelectedRide(null)}
-        >
-            <Icon name="back" color={colors.textPrimary} />
-            <Text style={[themedStyles.backButtonText, { color: colors.textPrimary }]}>
-                Rides
-            </Text>
-        </TouchableOpacity>
-
-        <Text style={[themedStyles.detailTitle, { color: colors.textPrimary }]}>
-            {ride.date} Ride to {ride.destination.split(',')[0]}
-        </Text>
-        
-        {/* Cost Section */}
-        <View style={[themedStyles.detailSection, { backgroundColor: colors.card }]}>
-            <View style={themedStyles.detailRow}>
-                <Icon name="money" color={colors.accent} />
-                <View style={themedStyles.detailTextContainer}>
-                    <Text style={[themedStyles.detailPrimaryText, { color: colors.textPrimary }]}>
-                        KSh {ride.cost.toFixed(2)}
-                    </Text>
-                    <Text style={[themedStyles.detailSecondaryText, { color: colors.textSecondary }]}>
-                        Final Trip Fare
-                    </Text>
-                </View>
-            </View>
-        </View>
-
-        {/* Driver and Car Section */}
-        <View style={[themedStyles.detailSection, { backgroundColor: colors.card }]}>
-            <View style={themedStyles.detailRow}>
-                <Icon name="car" color={colors.accent} />
-                <View style={themedStyles.detailTextContainer}>
-                    <Text style={[themedStyles.detailPrimaryText, { color: colors.textPrimary }]}>
-                        {ride.driver}
-                    </Text>
-                    <Text style={[themedStyles.detailSecondaryText, { color: colors.textSecondary }]}>
-                        {ride.car}
-                    </Text>
-                </View>
-            </View>
+      <ThemedTouchableOpacity
+        key={ride.id}
+        activeOpacity={0.8}
+        style={[themedStyles.rideCard]}
+        onPress={() => setSelectedRide(ride)}
+      >
+        <View style={themedStyles.rideCardHeader}>
+          <View style={themedStyles.rideCardTitleContainer}>
+            <ThemedText style={[themedStyles.rideDate]}>
+              {ride.date}
+            </ThemedText>
+            <ThemedText style={[themedStyles.rideCost]}>
+              KSh {ride.cost.toFixed(2)}
+            </ThemedText>
+          </View>
         </View>
         
-        {/* Timeline (Pickup and Destination) Section */}
-        <View style={[themedStyles.detailSection, { backgroundColor: colors.card }]}>
-            <View style={themedStyles.detailTimelineRow}>
-                <Icon name="location" color={colors.accent} />
-                <View style={themedStyles.detailTimelineText}>
-                    <Text style={[themedStyles.detailPrimaryText, { color: colors.textPrimary }]}>
-                        {ride.pickup} ({ride.time})
-                    </Text>
-                    <Text style={[themedStyles.detailSecondaryText, { color: colors.textSecondary }]}>
-                        {ride.destination} ({ride.duration} mins)
-                    </Text>
-                </View>
-            </View>
+        <View style={themedStyles.locationDetail}>
+          <View style={[themedStyles.locationText, {marginBottom:10}]}>
+            <ThemedText style={[themedStyles.locationTextSecondary,{color:colors.textSecondary}]}>
+              From:
+            </ThemedText>
+            <ThemedText style={[themedStyles.locationTextSecondary]}>
+              {ride.pickup}
+            </ThemedText>
+          </View>
+          <View style={themedStyles.locationText}>
+            <ThemedText style={[themedStyles.locationTextSecondary,{color:colors.textSecondary}]}>
+              To:
+            </ThemedText>
+            <ThemedText style={[themedStyles.locationTextPrimary]}>
+              {ride.destination}
+            </ThemedText>
+          </View>
         </View>
-        
-        {/* Button for Support/Invoice */}
-        <TouchableOpacity
-        style={[themedStyles.supportButton, { backgroundColor: colors.primary }]}
-        onPress={() => handleSupportButtonPress(ride)}
-        >
-            <Text style={themedStyles.supportButtonText}>
-                Get Invoice or Trip Help
-            </Text>
-        </TouchableOpacity>
-        
-    </ScrollView>
+      </ThemedTouchableOpacity>
   );
 
   // --- MAIN RENDER LOGIC ---
   return (
-    <SafeAreaView style={[themedStyles.safeArea, { backgroundColor: colors.background }]}>
-      <StatusBar barStyle={colors.textPrimary === '#E0E0E0' ? 'light-content' : 'dark-content'} />
+    <SafeAreaView style={[themedStyles.safeArea]}>
       
       {selectedRide ? (
-        renderRideDetail(selectedRide)
+        // RideDetail(selectedRide)
+        <RideDetails ride={selectedRide} onGoBack={() => setSelectedRide(null)} />
       ) : (
         <ScrollView 
           style={themedStyles.scrollView}
-          contentContainerStyle={themedStyles.listContent}
           showsVerticalScrollIndicator={false}
         >
-          <Text style={[themedStyles.pageTitle, { color: colors.textPrimary }]}>
+          <ThemedText style={[themedStyles.pageTitle]}>
             Your Trips
-          </Text>
+          </ThemedText>
 
           <View style={themedStyles.ridesListContainer}>
             {mockRides.map(renderRideItem)}
           </View>
           
-          <Text style={[themedStyles.footerText, { color: colors.textSecondary }]}>
+          <ThemedText style={[themedStyles.footerText, { color: colors.textSecondary }]}>
              End of trip history. Trips are available for 6 months.
-          </Text>
+          </ThemedText>
         </ScrollView>
       )}
     </SafeAreaView>
@@ -249,20 +170,16 @@ const styles = (colors: ColorPalette) => StyleSheet.create({
     flex: 1,
   },
   scrollView: {
-    flex: 1,
+    paddingVertical:30,
+    paddingHorizontal: 16,
   },
   pageTitle: {
-    fontSize: 34,
+    fontSize: 28,
     fontWeight: 'bold',
     marginBottom: 20,
-    paddingHorizontal: 16,
-  },
-  listContent: {
-    paddingBottom: 40,
-    paddingTop: (StatusBar.currentHeight || 0) + 10,
+    lineHeight:50
   },
   ridesListContainer: {
-    paddingHorizontal: 16,
     gap: 15,
   },
   footerText: {
@@ -276,12 +193,6 @@ const styles = (colors: ColorPalette) => StyleSheet.create({
   rideCard: {
     padding: 16,
     borderRadius: 12,
-    borderWidth: 1,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
   },
   rideCardHeader: {
     flexDirection: 'row',
@@ -294,7 +205,6 @@ const styles = (colors: ColorPalette) => StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginLeft: 10,
   },
   rideDate: {
     fontSize: 16,
@@ -307,23 +217,12 @@ const styles = (colors: ColorPalette) => StyleSheet.create({
   
   // Location Detail Section
   locationDetail: {
-    flexDirection: 'row',
     marginTop: 10,
-  },
-  locationPins: {
-    alignItems: 'center',
-    marginRight: 10,
-    width: 20,
-  },
-  verticalLine: {
-    width: 2,
-    height: 30,
-    backgroundColor: colors.border,
-    marginVertical: 2,
   },
   locationText: {
     flex: 1,
-    justifyContent: 'space-between',
+    flexDirection: 'row',
+    gap: 6,
   },
   locationTextPrimary: {
     fontSize: 16,
@@ -340,8 +239,7 @@ const styles = (colors: ColorPalette) => StyleSheet.create({
   },
   detailContent: {
     paddingHorizontal: 16,
-    paddingBottom: 40,
-    paddingTop: (StatusBar.currentHeight || 0) + 10,
+    marginVertical: 30,
   },
   backButton: {
     flexDirection: 'row',
@@ -360,26 +258,10 @@ const styles = (colors: ColorPalette) => StyleSheet.create({
   detailSection: {
     borderRadius: 12,
     padding: 18,
-    marginBottom: 15,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 3,
-    elevation: 2,
-  },
-  detailRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    marginBottom: 15
   },
   detailTimelineRow: {
     flexDirection: 'row',
-  },
-  detailTextContainer: {
-    marginLeft: 15,
-  },
-  detailTimelineText: {
-    marginLeft: 15,
-    justifyContent: 'center',
   },
   detailPrimaryText: {
     fontSize: 18,

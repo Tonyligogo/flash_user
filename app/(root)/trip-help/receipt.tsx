@@ -1,15 +1,14 @@
-import React from 'react';
 import {
   View,
   Text,
-  ScrollView,
   StyleSheet,
-  TouchableOpacity,
 } from 'react-native';
-import { useLocalSearchParams, Stack, useRouter } from 'expo-router'; // <-- NEW IMPORTS
+import { useLocalSearchParams } from 'expo-router';
 import { ColorPalette } from '@/types/type';
 import { useTheme } from '@/constants/ThemeContext';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import SupportLayout from '@/components/support-layout';
+import { ThemedText } from '@/components/themed-text';
+import { ThemedView } from '@/components/themed-view';
 
 
 // --- TYPE DEFINITIONS ---
@@ -37,21 +36,10 @@ const MOCK_RECEIPT: ReceiptDetails = {
     invoiceId: 'INV-20251005-001A',
 };
 
-// --- ICON PLACEHOLDER ---
-const Icon = ({ name, color }: { name: string; color: string }) => {
-  const emojiMap: { [key: string]: string } = {
-    'back': '❮',
-    'wallet': '💳',
-  };
-  return <Text style={{ fontSize: 20, color: color }}>{emojiMap[name] || '?'}</Text>;
-};
-
-
 // --- MAIN COMPONENT ---
 const TripReceiptScreen: React.FC = () => {
     const { colors } = useTheme();
     const themedStyles = styles(colors);
-    const router = useRouter();
     const params = useLocalSearchParams();
 
     const rideId = params.rideId;
@@ -70,105 +58,64 @@ const TripReceiptScreen: React.FC = () => {
     ];
 
     return (
-        <SafeAreaView style={[themedStyles.container, { backgroundColor: colors.background }]}>
-            
-            <Stack.Screen 
-                options={{ 
-                    headerShown: false,
-                    gestureEnabled: true,
-                }} 
-            />
-
-            {/* Custom Header with Back Button */}
-            <View style={[themedStyles.header, { borderBottomColor: colors.border }]}>
-                <TouchableOpacity style={themedStyles.backButton} onPress={() => router.back()}>
-                    <Icon name="back" color={colors.textPrimary} />
-                </TouchableOpacity>
-                <Text style={[themedStyles.headerTitle, { color: colors.textPrimary }]}>
-                    Trip Receipt
-                </Text>
-            </View>
-
-            <ScrollView 
-                style={themedStyles.scrollView}
-                contentContainerStyle={themedStyles.contentContainer}
-                showsVerticalScrollIndicator={false}
-            >
-                {/* Invoice ID and Ride ID */}
-                <View style={themedStyles.metaContainer}>
-                    <Text style={[themedStyles.metaText, { color: colors.textSecondary }]}>
+        <SupportLayout title='Trip Receipt'>
+            <>
+            {/* Invoice ID and Ride ID */}
+            <View style={themedStyles.metaContainer}>
+                    <ThemedText style={[themedStyles.metaText]}>
                         Invoice ID: {receipt.invoiceId}
-                    </Text>
-                    <Text style={[themedStyles.metaText, { color: colors.textSecondary }]}>
+                    </ThemedText>
+                    <ThemedText style={[themedStyles.metaText]}>
                         Ride ID: {rideId}
-                    </Text>
+                    </ThemedText>
                 </View>
 
                 {/* Fare Breakdown */}
-                <View style={[themedStyles.card, { backgroundColor: colors.card }]}>
-                    <Text style={[themedStyles.sectionHeading, { color: colors.textPrimary }]}>
+                <ThemedView style={[themedStyles.card]}>
+                    <ThemedText style={[themedStyles.sectionHeading]}>
                         Fare Breakdown
-                    </Text>
+                    </ThemedText>
                     
                     {fareItems.map((item, index) => (
                         <View key={index} style={themedStyles.fareRow}>
-                            <Text style={[themedStyles.fareLabel, { color: colors.textPrimary }]}>
+                            <ThemedText style={[themedStyles.fareLabel]}>
                                 {item.label}
-                            </Text>
-                            <Text style={[themedStyles.fareAmount, { color: item.amount < 0 ? colors.accent : colors.textPrimary }]}>
+                            </ThemedText>
+                            <ThemedText style={[themedStyles.fareAmount]}>
                                 {item.amount < 0 ? `-KSh ${(-item.amount).toFixed(2)}` : `KSh ${item.amount.toFixed(2)}`}
-                            </Text>
+                            </ThemedText>
                         </View>
                     ))}
 
                     {/* Total */}
-                    <View style={[themedStyles.totalRow, { borderTopColor: colors.border }]}>
-                        <Text style={[themedStyles.totalLabel, { color: colors.textPrimary }]}>
+                    <View style={[themedStyles.totalRow, { borderTopColor: colors.textSecondary }]}>
+                        <ThemedText style={[themedStyles.totalLabel]}>
                             Total Charged
-                        </Text>
-                        <Text style={[themedStyles.totalAmount, { color: colors.textPrimary }]}>
+                        </ThemedText>
+                        <ThemedText style={[themedStyles.totalAmount]}>
                             KSh {receipt.total.toFixed(2)}
-                        </Text>
+                        </ThemedText>
                     </View>
-                </View>
+                </ThemedView>
 
                 {/* Payment Method */}
-                <View style={[themedStyles.card, { backgroundColor: colors.card }]}>
-                    <Text style={[themedStyles.sectionHeading, { color: colors.textPrimary }]}>
+                <ThemedView style={[themedStyles.card]}>
+                    <ThemedText style={[themedStyles.sectionHeading]}>
                         Payment Method
-                    </Text>
-                    <View style={themedStyles.paymentRow}>
-                        <Icon name="wallet" color={colors.textSecondary} />
-                        <Text style={[themedStyles.paymentText, { color: colors.textPrimary }]}>
-                            {receipt.paymentMethod}
-                        </Text>
-                    </View>
-                </View>
-            </ScrollView>
-        </SafeAreaView>
+                    </ThemedText>
+                        <ThemedText style={{fontSize:15}}>{receipt.paymentMethod}</ThemedText>
+                </ThemedView>
+            </>
+        </SupportLayout>
     );
 };
 
 // --- STYLESHEET DEFINITION ---
 const styles = (colors: ColorPalette) => StyleSheet.create({
-    container: { flex: 1 },
-    scrollView: { flex: 1 },
-    contentContainer: { paddingHorizontal: 16, paddingBottom: 40 },
-    
-    header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingHorizontal: 16,
-        paddingVertical: 12,
-        borderBottomWidth: StyleSheet.hairlineWidth,
-    },
-    headerTitle: { fontSize: 20, fontWeight: 'bold' },
-    backButton: { position: 'absolute', left: 16, padding: 5 }, // For custom back icon
-    
+
     // Meta
-    metaContainer: { marginTop: 20, marginBottom: 15 },
-    metaText: { fontSize: 13, textAlign: 'center', marginBottom: 2 },
+    metaContainer: { marginBottom: 16 },
+    metaText: { textAlign: 'center', marginBottom: 2 },
 
     // Card/Breakdown
     card: { borderRadius: 12, padding: 18, marginBottom: 20, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.08, shadowRadius: 3, elevation: 2 },
@@ -182,7 +129,6 @@ const styles = (colors: ColorPalette) => StyleSheet.create({
 
     // Payment
     paymentRow: { flexDirection: 'row', alignItems: 'center' },
-    paymentText: { fontSize: 15, marginLeft: 10 },
 
     // Download Button
     downloadButton: {

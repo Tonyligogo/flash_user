@@ -34,8 +34,8 @@ export default function App() {
       <MapView 
       provider={PROVIDER_DEFAULT} 
       tintColor='black'
-      mapType='mutedStandard'
-      showsPointsOfInterests={false}
+      mapType='standard'
+      showsPointsOfInterest={false}
       showsUserLocation={true}
       userInterfaceStyle='dark'
       style={{flex:1}}

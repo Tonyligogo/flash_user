@@ -12,7 +12,7 @@ import { ColorPalette } from '@/types/type';
 import { useTheme } from '@/constants/ThemeContext';
 import SupportLayout from '@/components/support-layout';
 
-const CommonStyles = (colors: ColorPalette) => ({
+const CommonStyles = (colors: ColorPalette) => StyleSheet.create ({
     card: {
         padding: 18,
         borderRadius: 12,
@@ -151,7 +151,6 @@ const ReportSafetyScreen: React.FC = () => {
                     </TouchableOpacity>
                 ))}
             </View>
-
 
             <Text style={[themedStyles.subHeading, { color: colors.textPrimary }]}>
                 2. Provide detailed description:

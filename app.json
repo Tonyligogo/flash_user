@@ -1,8 +1,5 @@
-require('dotenv').config();
-
-export default ({ config }) => {
-  return {
-    ...config,
+{
+  "expo": {
     "name": "Flash",
     "slug": "flash",
     "version": "1.0.0",
@@ -12,7 +9,11 @@ export default ({ config }) => {
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.ligogo.flash",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -23,7 +24,7 @@ export default ({ config }) => {
       },
       "config": {
         "googleMaps": {
-          "apiKey": process.env.GOOGLE_MAPS_API_KEY 
+          "apiKey": "AIzaSyAYYMFzURt2Z9ruNU3jfrp5ATVCLRykLOw"
         }
       },
       "edgeToEdgeEnabled": true,
@@ -47,11 +48,25 @@ export default ({ config }) => {
             "backgroundColor": "#000000"
           }
         }
-      ]
+      ],
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "79e02f26-85c5-406e-a6b1-45a13fd5af1e"
+      }
+    },
+    "owner": "ligogo",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/79e02f26-85c5-406e-a6b1-45a13fd5af1e"
     }
-  };
-};
+  }
+}

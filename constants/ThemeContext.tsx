@@ -56,7 +56,7 @@ const darkColors: ColorPalette = {
 
 // Define a default context value (will be overwritten by Provider)
 const defaultThemeContext: ThemeContextType = {
-    isDark: false,
+    isDark: true,
     colors: lightColors,
     theme: 'system',
     setTheme: () => console.warn('setTheme not available outside ThemeProvider'),

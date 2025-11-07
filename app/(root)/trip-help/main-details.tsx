@@ -1,31 +1,16 @@
 import { useTheme } from '@/constants/ThemeContext';
 import { ColorPalette } from '@/types/type';
-import { router, Stack, useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import React from 'react';
 import {
   View,
-  Text,
-  ScrollView,
-  StatusBar,
   StyleSheet,
   TouchableOpacity,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-
-// --- ICON PLACEHOLDER ---
-const Icon = ({ name, color, iconSize = 20 }: { name: string; color: string; iconSize?: number }) => {
-  const emojiMap: { [key: string]: string } = {
-    'close': '✕',
-    'receipt': '🧾',
-    'money': '💵',
-    'star': '⭐',
-    'lost': '📦',
-    'safety': '⛑️',
-    'feedback': '💬',
-    'chevron-right': '❯',
-  };
-  return <Text style={{ fontSize: iconSize, color: color, width: 20, textAlign: 'center' }}>{emojiMap[name] || '?'}</Text>;
-};
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { ThemedText } from '@/components/themed-text';
+import SupportLayout from '@/components/support-layout';
+import { ThemedView } from '@/components/themed-view';
 
 // --- MOCK SUPPORT MENU DATA ---
 const supportSections = [
@@ -97,110 +82,60 @@ const TripHelpScreen = () => {
         key={item.action}
         style={[
             themedStyles.menuItem,
-            { borderBottomColor: index < total - 1 ? colors.border : 'transparent' },
+            { borderBottomColor: index < total - 1 ? colors.textSecondary : 'transparent' },
         ]}
         onPress={() => handleSupportItemPress(item.action)}
     >
         <View style={themedStyles.menuItemLeft}>
-            <Icon name={item.icon} color={colors.textPrimary} />
-            <Text style={[themedStyles.menuItemText, { color: colors.textPrimary }]}>{item.label}</Text>
+            <ThemedText>{item.label}</ThemedText>
         </View>
-        <Icon name="chevron-right" color={colors.textSecondary} />
+        <MaterialIcons name="arrow-forward-ios" size={16} color={colors.textSecondary} />
     </TouchableOpacity>
   );
 
   const renderSupportSection = (section: typeof supportSections[0], sectionIndex: number) => (
     <View key={sectionIndex} style={themedStyles.sectionContainer}>
-        <Text style={[themedStyles.sectionTitle, { color: colors.textSecondary }]}>
+        <ThemedText style={[themedStyles.sectionTitle]}>
             {section.title.toUpperCase()}
-        </Text>
-        <View style={[themedStyles.card, { backgroundColor: colors.card }]}>
+        </ThemedText>
+        <ThemedView style={[themedStyles.card]}>
             {section.items.map((item, index) =>
                 renderSupportItem(item, index, section.items.length)
             )}
-        </View>
+        </ThemedView>
     </View>
   );
 
   return (
-    <SafeAreaView style={[themedStyles.safeArea, { backgroundColor: colors.background }]}>
-      <StatusBar barStyle={colors.textPrimary === '#E0E0E0' ? 'light-content' : 'dark-content'} />
-      <Stack.Screen 
-        options={{ 
-            headerShown: false,
-        }} 
-      />
-      
-      {/* Header */}
-      <View style={[themedStyles.header, { borderBottomColor: colors.border }]}>
-        <Text style={[themedStyles.headerTitle, { color: colors.textPrimary }]}>Trip Help</Text>
-        <TouchableOpacity style={themedStyles.closeButton} onPress={()=>router.back()}>
-          <Icon name="close" color={colors.textPrimary} iconSize={32} />
-        </TouchableOpacity>
-      </View>
-
-      <ScrollView 
-        style={themedStyles.scrollView}
-        contentContainerStyle={themedStyles.contentContainer}
-        showsVerticalScrollIndicator={false}
-      >
-        
-        {/* Trip Summary Card */}
-        <View style={[themedStyles.tripSummaryCard, { backgroundColor: colors.card }]}>
-            <Text style={[themedStyles.summaryTitle, { color: colors.textPrimary }]}>
+   
+    <SupportLayout title='Trip Help'>
+      <>
+       {/* Trip Summary Card */}
+       <ThemedView style={[themedStyles.tripSummaryCard]}>
+            <ThemedText style={[themedStyles.summaryTitle]}>
                 {ride.date} Ride
-            </Text>
-            <Text style={[themedStyles.summaryDetails, { color: colors.textSecondary }]}>
+            </ThemedText>
+            <ThemedText style={[themedStyles.summaryDetails]}>
                 {ride.pickup} to {ride.destination}
-            </Text>
-            <Text style={[themedStyles.summaryCost, { color: colors.textPrimary }]}>
+            </ThemedText>
+            <ThemedText style={[themedStyles.summaryCost]}>
                 KSh {ride.cost.toFixed(2)}
-            </Text>
-        </View>
+            </ThemedText>
+        </ThemedView>
 
         {/* Support Options */}
-        <Text style={[themedStyles.helpHeading, { color: colors.textPrimary }]}>
+        <ThemedText style={[themedStyles.helpHeading]}>
             What do you need help with?
-        </Text>
+        </ThemedText>
         
         {supportSections.map(renderSupportSection)}
-        
-      </ScrollView>
-    </SafeAreaView>
+      </>
+    </SupportLayout>
   );
 };
 
 // --- STYLESHEET DEFINITION ---
 const styles = (colors: ColorPalette) => StyleSheet.create({
-    safeArea: {
-        flex: 1,
-    },
-    scrollView: {
-        flex: 1,
-    },
-    contentContainer: {
-        paddingHorizontal: 16,
-        paddingBottom: 40,
-    },
-
-    // --- Header Styles ---
-    header: {
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
-        paddingHorizontal: 16,
-        paddingVertical: 12,
-        borderBottomWidth: StyleSheet.hairlineWidth,
-    },
-    headerTitle: {
-        fontSize: 20,
-        fontWeight: 'bold',
-    },
-    closeButton: {
-        position: 'absolute',
-        right: 16,
-        padding: 5,
-    },
 
     // --- Summary Card Styles ---
     tripSummaryCard: {
@@ -259,10 +194,6 @@ const styles = (colors: ColorPalette) => StyleSheet.create({
     menuItemLeft: {
         flexDirection: 'row',
         alignItems: 'center',
-    },
-    menuItemText: {
-        fontSize: 16,
-        marginLeft: 15,
     },
 });
 

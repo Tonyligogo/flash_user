@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
+import { Stack, useLocalSearchParams } from 'expo-router';
 import { ColorPalette } from '@/types/type';
 import { useTheme } from '@/constants/ThemeContext';
 import { SafeAreaView } from 'react-native-safe-area-context';

@@ -1,9 +1,12 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, StatusBar } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, StatusBar, useColorScheme } from 'react-native';
 import { useRouter } from 'expo-router';
 import { ColorPalette } from '@/types/type';
 import { useTheme } from '@/constants/ThemeContext';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { ThemedText } from '@/components/themed-text';
+import { ThemedView } from '@/components/themed-view';
+import { Colors } from '@/constants/theme';
 
 // --- MOCK DATA ---
 interface ChatThread {
@@ -37,25 +40,25 @@ const getInitials = (name: string): string => {
 };
 
 const createStyles = (colors: ColorPalette) => StyleSheet.create({
-    safeArea: { flex: 1, backgroundColor: colors.background, paddingHorizontal: 16 },
-    container: { flex: 1 },
-    headerTitle: { fontSize: 22, fontWeight: 'bold', color: colors.textPrimary, paddingLeft: 16, paddingTop: 10 },
-    
+    safeArea: { flex: 1, paddingHorizontal: 16 },
+    container: { flex: 1 },    
     // List Styles
+    chatWrapper: {
+        paddingVertical:4,
+        paddingHorizontal:16,
+        borderRadius:12,
+        marginBottom: 12 
+    },
     chatItem: {
         flexDirection: 'row',
         alignItems: 'center',
         paddingVertical: 16,
-        borderBottomWidth: StyleSheet.hairlineWidth,
-        borderBottomColor: colors.border,
-        // backgroundColor: colors.card,
-        backgroundColor: colors.background
     },
     pageTitle: {
-        fontSize: 34,
+        fontSize: 28,
         fontWeight: 'bold',
-        marginBottom: 20,
-        color:'#E0E0E0',
+        marginVertical: 30,
+        lineHeight: 34,
       },
     initialAvatar: {
         width: 50,
@@ -77,11 +80,9 @@ const createStyles = (colors: ColorPalette) => StyleSheet.create({
     driverName: {
         fontSize: 17,
         fontWeight: 'bold',
-        color: colors.textPrimary,
     },
     lastMessage: {
         fontSize: 14,
-        color: colors.textSecondary,
         marginTop: 2,
     },
     metaContainer: {
@@ -89,10 +90,8 @@ const createStyles = (colors: ColorPalette) => StyleSheet.create({
     },
     timestamp: {
         fontSize: 12,
-        color: colors.textSecondary,
     },
     unreadBadge: {
-        backgroundColor: colors.primary,
         borderRadius: 10,
         minWidth: 20,
         paddingHorizontal: 6,
@@ -102,7 +101,7 @@ const createStyles = (colors: ColorPalette) => StyleSheet.create({
         marginTop: 4,
     },
     unreadText: {
-        color: colors.buttonText,
+        color:'white',
         fontSize: 12,
         fontWeight: 'bold',
     },
@@ -119,29 +118,33 @@ const ChatItem: React.FC<{ thread: ChatThread, styles: ReturnType<typeof createS
     const initials = getInitials(thread.driverName);
     const randomIndex = Math.floor(Math.random() * AVATAR_COLORS.length);
     const avatarColor = AVATAR_COLORS[randomIndex];
+    const colorScheme = useColorScheme();
+    const colorTheme = colorScheme === 'dark' ? 'dark' : 'light';
 
     return (
-        <TouchableOpacity style={styles.chatItem} onPress={onPress}>
+            <ThemedView style={[styles.chatWrapper]}>
+        <TouchableOpacity activeOpacity={0.8} style={styles.chatItem} onPress={onPress}>
             {/* Initials Avatar */}
             <View style={[styles.initialAvatar, { backgroundColor: avatarColor }]}>
                 <Text style={styles.initialsText}>{initials}</Text>
             </View>
             
             <View style={styles.textContainer}>
-                <Text style={styles.driverName}>{thread.driverName}</Text>
-                <Text style={styles.lastMessage} numberOfLines={1}>
+                <ThemedText style={styles.driverName}>{thread.driverName}</ThemedText>
+                <ThemedText style={[styles.lastMessage, {color: Colors[colorTheme].icon }]} numberOfLines={1}>
                     {thread.lastMessage}
-                </Text>
+                </ThemedText>
             </View>
             <View style={styles.metaContainer}>
-                <Text style={styles.timestamp}>{thread.timestamp}</Text>
+                <Text style={[styles.timestamp, {color: Colors[colorTheme].icon }]}>{thread.timestamp}</Text>
                 {thread.unreadCount > 0 && (
-                    <View style={styles.unreadBadge}>
+                    <View style={[styles.unreadBadge, { backgroundColor: Colors[colorTheme].primary }]}>
                         <Text style={styles.unreadText}>{thread.unreadCount}</Text>
                     </View>
                 )}
             </View>
         </TouchableOpacity>
+            </ThemedView>
     );
 };
 
@@ -157,13 +160,12 @@ const ChatsScreen: React.FC = () => {
 
     return (
         <SafeAreaView style={themedStyles.safeArea}>
-            <StatusBar barStyle={themedStyles.pageTitle.color === '#E0E0E0' ? 'light-content' : 'dark-content'} />
             
-                    <Text style={[themedStyles.pageTitle, { color: colors.textPrimary, paddingTop: (StatusBar.currentHeight || 0), }]}>Messages</Text>
+                    <ThemedText style={[themedStyles.pageTitle]}>Messages</ThemedText>
             
             <View style={themedStyles.container}>
                 {mockChats.length === 0 ? (
-                    <Text style={themedStyles.noChatsText}>No recent chats found.</Text>
+                    <ThemedText style={themedStyles.noChatsText}>No recent chats found.</ThemedText>
                 ) : (
                     <FlatList
                         data={mockChats}
@@ -171,11 +173,11 @@ const ChatsScreen: React.FC = () => {
                         renderItem={({ item }) => (
                             <ChatItem 
                                 thread={item} 
-                                styles={themedStyles} 
+                                styles={themedStyles}
                                 onPress={() => navigateToChat(item.id)}
                             />
                         )}
-                        style={{ backgroundColor: colors.background }} 
+                        
                     />
                 )}
             </View>

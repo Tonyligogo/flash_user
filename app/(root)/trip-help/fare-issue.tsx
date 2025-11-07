@@ -6,22 +6,20 @@ import {
   TouchableOpacity,
   TextInput,
   ActivityIndicator,
+  useColorScheme,
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { ColorPalette } from '@/types/type';
 import { useTheme } from '@/constants/ThemeContext';
 import SupportLayout from '@/components/support-layout';
+import { ThemedText } from '@/components/themed-text';
+import { ThemedView } from '@/components/themed-view';
+import { Colors } from '@/constants/theme';
 
-const CommonStyles = (colors: ColorPalette) => ({
+const CommonStyles = (colors: ColorPalette) => StyleSheet.create ({
     card: {
         padding: 18,
         borderRadius: 12,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.08,
-        shadowRadius: 3,
-        elevation: 2,
-        borderWidth: StyleSheet.hairlineWidth,
         marginBottom: 20,
     },
     textInput: {
@@ -29,7 +27,6 @@ const CommonStyles = (colors: ColorPalette) => ({
         height: 120,
         borderRadius: 12,
         padding: 15,
-        borderWidth: 1,
         fontSize: 16,
         textAlignVertical: 'top',
         marginBottom: 20,
@@ -42,7 +39,7 @@ const CommonStyles = (colors: ColorPalette) => ({
         marginTop: 30,
     },
     submitText: {
-        color: '#FFFFFF',
+        color:'white',
         fontSize: 17,
         fontWeight: 'bold',
     },
@@ -52,7 +49,7 @@ const CommonStyles = (colors: ColorPalette) => ({
 const FARE_SUMMARY = {
     date: "2025/10/01",
     totalCharged: 1250.50,
-    paymentMethod: 'Mastercard ending in 1004',
+    paymentMethod: 'Mpesa - 0712345678',
 };
 
 const ISSUE_CATEGORIES = [
@@ -67,6 +64,8 @@ const ISSUE_CATEGORIES = [
 const FareIssueScreen: React.FC = () => {
     const { colors } = useTheme();
     const themedStyles = { ...CommonStyles(colors), ...localStyles(colors) };
+    const colorScheme = useColorScheme();
+    const inputTheme = colorScheme === 'dark' ? 'dark' : 'light';
     const router = useRouter();
     const params = useLocalSearchParams();
     const rideId = params.rideId as string;
@@ -100,43 +99,44 @@ const FareIssueScreen: React.FC = () => {
             title="Issue with Fare" 
             isSubmitting={isSubmitting}
         >
-            <Text style={[themedStyles.heading, { color: colors.textPrimary }]}>
+            <ThemedText style={[themedStyles.heading]}>
                 What&apos;s wrong with your fare?
-            </Text>
+            </ThemedText>
             
             {/* Fare Summary Card */}
-            <View style={[themedStyles.card, { backgroundColor: colors.card }]}>
+            <ThemedView style={[themedStyles.card]}>
                 <View style={themedStyles.summaryRow}>
-                    <Text style={[themedStyles.summaryLabel, { color: colors.textSecondary }]}>Date:</Text>
-                    <Text style={[themedStyles.summaryValue, { color: colors.textPrimary }]}>{FARE_SUMMARY.date}</Text>
+                    <ThemedText style={[themedStyles.summaryLabel]}>Date:</ThemedText>
+                    <ThemedText style={[themedStyles.summaryValue]}>{FARE_SUMMARY.date}</ThemedText>
                 </View>
                 <View style={themedStyles.summaryRow}>
-                    <Text style={[themedStyles.summaryLabel, { color: colors.textSecondary }]}>Charged Amount:</Text>
-                    <Text style={[themedStyles.summaryTotal, { color: colors.textPrimary }]}>KSh {FARE_SUMMARY.totalCharged.toFixed(2)}</Text>
+                    <ThemedText style={[themedStyles.summaryLabel]}>Charged Amount:</ThemedText>
+                    <ThemedText style={[themedStyles.summaryTotal]}>KSh {FARE_SUMMARY.totalCharged.toFixed(2)}</ThemedText>
                 </View>
                 <View style={themedStyles.summaryRow}>
-                    <Text style={[themedStyles.summaryLabel, { color: colors.textSecondary }]}>Payment:</Text>
-                    <Text style={[themedStyles.summaryValue, { color: colors.textPrimary }]}>{FARE_SUMMARY.paymentMethod}</Text>
+                    <ThemedText style={[themedStyles.summaryLabel]}>Payment:</ThemedText>
+                    <ThemedText style={[themedStyles.summaryValue]}>{FARE_SUMMARY.paymentMethod}</ThemedText>
                 </View>
-            </View>
+            </ThemedView>
 
-            <Text style={[themedStyles.subHeading, { color: colors.textPrimary }]}>
+            <ThemedText style={[themedStyles.subHeading]}>
                 1. Select the issue type:
-            </Text>
-            <View style={[themedStyles.card, { backgroundColor: colors.card }]}>
+            </ThemedText>
+            <ThemedView style={[themedStyles.card]}>
                 {ISSUE_CATEGORIES.map((cat, index) => (
                     <TouchableOpacity
                         key={cat.value}
+                        activeOpacity={0.8}
                         style={[
                             themedStyles.categoryItem, 
-                            { borderBottomColor: index < ISSUE_CATEGORIES.length - 1 ? colors.border : 'transparent' }
+                            { borderBottomColor: index < ISSUE_CATEGORIES.length - 1 ? Colors[inputTheme].borders : 'transparent' }
                         ]}
                         onPress={() => setSelectedCategory(cat.value)}
                         disabled={isSubmitting}
                     >
-                        <Text style={[themedStyles.categoryLabel, { color: colors.textPrimary }]}>
+                        <ThemedText style={[themedStyles.categoryLabel]}>
                             {cat.label}
-                        </Text>
+                        </ThemedText>
                         <View style={[
                             themedStyles.radio, 
                             { borderColor: colors.border },
@@ -144,27 +144,26 @@ const FareIssueScreen: React.FC = () => {
                         ]} />
                     </TouchableOpacity>
                 ))}
-            </View>
+            </ThemedView>
 
 
-            <Text style={[themedStyles.subHeading, { color: colors.textPrimary, marginTop: 10 }]}>
+            <ThemedText style={[themedStyles.subHeading, { marginTop: 10 }]}>
                 2. Explain in detail:
-            </Text>
+            </ThemedText>
             <TextInput
                 style={[
                     themedStyles.textInput, 
                     { 
-                        backgroundColor: colors.card,
-                        color: colors.textPrimary,
-                        borderColor: colors.border,
+                        backgroundColor: Colors[inputTheme].background,
+                        color: Colors[inputTheme].text,
                     }
                 ]}
                 multiline
                 numberOfLines={5}
                 value={details}
                 onChangeText={setDetails}
-                placeholder="E.g., The app quoted KSh 1000, but I was charged KSh 1250. I confirmed there were no tolls."
-                placeholderTextColor={colors.textSecondary}
+                placeholder="E.g., The app quoted KSh 1000, but I was charged KSh 1250."
+                placeholderTextColor={Colors[inputTheme].textSecondary}
                 editable={!isSubmitting}
             />
 
@@ -172,15 +171,16 @@ const FareIssueScreen: React.FC = () => {
             <TouchableOpacity 
                 style={[
                     themedStyles.submitButton, 
-                    { backgroundColor: isSubmitting || !selectedCategory || !details.trim() ? colors.border : colors.primary }
+                    { backgroundColor: Colors[inputTheme].primary }
                 ]}
+                activeOpacity={0.8}
                 onPress={handleSubmit}
                 disabled={isSubmitting || !selectedCategory || !details.trim()}
             >
                 {isSubmitting ? (
                     <ActivityIndicator color="#FFFFFF" />
                 ) : (
-                    <Text style={themedStyles.submitText}>Submit Fare Dispute</Text>
+                    <Text style={[themedStyles.submitText]}>Submit Fare Dispute</Text>
                 )}
             </TouchableOpacity>
 
@@ -194,6 +194,7 @@ const localStyles = (colors: ColorPalette) => StyleSheet.create({
         fontWeight: 'bold',
         marginBottom: 15,
         textAlign: 'center',
+        lineHeight:48
     },
     subHeading: {
         fontSize: 18,

@@ -1,7 +1,6 @@
 import React from 'react';
 import {
   View,
-  Text,
   ScrollView,
   StatusBar,
   StyleSheet,
@@ -12,6 +11,7 @@ import { Stack, useRouter } from 'expo-router';
 import { useTheme } from '@/constants/ThemeContext';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ColorPalette } from '@/types/type';
+import { ThemedText } from './themed-text';
 
 
 interface SupportLayoutProps {
@@ -22,11 +22,11 @@ interface SupportLayoutProps {
 }
 
 // --- ICON PLACEHOLDER ---
-const Icon = ({ name, color }: { name: string; color: string }) => {
+const Icon = ({ name }: { name: string; }) => {
   const emojiMap: { [key: string]: string } = {
     'back': '❮',
   };
-  return <Text style={{ fontSize: 20, color: color }}>{emojiMap[name] || '?'}</Text>;
+  return <ThemedText style={{ fontSize: 20}}>{emojiMap[name] || '?'}</ThemedText>;
 };
 
 
@@ -41,7 +41,7 @@ const SupportLayout: React.FC<SupportLayoutProps> = ({
   const router = useRouter();
 
   return (
-    <SafeAreaView style={[themedStyles.container, { backgroundColor: colors.background }]}>
+    <SafeAreaView style={[themedStyles.container]}>
       
       {/* 1. Expo Router Stack Configuration (hides native header) */}
       <Stack.Screen 
@@ -51,20 +51,20 @@ const SupportLayout: React.FC<SupportLayoutProps> = ({
         }} 
       />
 
-      <StatusBar barStyle={colors.textPrimary === '#E0E0E0' ? 'light-content' : 'dark-content'} />
+      <StatusBar />
 
       {/* 2. Custom Header with Back Button */}
-      <View style={[themedStyles.header, { borderBottomColor: colors.border }]}>
+      <View style={[themedStyles.header, { borderBottomColor: colors.textSecondary }]}>
         <TouchableOpacity 
           style={themedStyles.backButton} 
           onPress={() => router.back()}
           disabled={isSubmitting} // Disable navigation during form submission
         >
-          <Icon name="back" color={colors.textPrimary} />
+          <Icon name="back" />
         </TouchableOpacity>
-        <Text style={[themedStyles.headerTitle, { color: colors.textPrimary }]}>
+        <ThemedText style={[themedStyles.headerTitle]}>
           {title}
-        </Text>
+        </ThemedText>
       </View>
 
       {/* 3. Scrollable Content Area */}
@@ -87,7 +87,7 @@ const styles = (colors: ColorPalette) => StyleSheet.create({
     contentContainer: { 
         paddingHorizontal: 16, 
         paddingVertical: 30, 
-        paddingBottom: 40 
+        // paddingBottom: 40 
     },
     
     // Header
