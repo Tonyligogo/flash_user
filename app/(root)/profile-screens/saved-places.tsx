@@ -1,4 +1,7 @@
 import SupportLayout from '@/components/support-layout';
+import { ThemedText } from '@/components/themed-text';
+import { ThemedView } from '@/components/themed-view';
+import { Colors } from '@/constants/theme';
 import { useTheme } from '@/constants/ThemeContext';
 import { ColorPalette } from '@/types/type';
 import React, { useState } from 'react';
@@ -12,7 +15,8 @@ import {
     Modal, 
     Alert, 
     KeyboardAvoidingView, // <-- NEW
-    Platform // <-- NEW
+    Platform, // <-- NEW
+    useColorScheme
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context'; 
 
@@ -45,12 +49,9 @@ const Icon = ({ name, color }: { name: string; color: string }) => {
 
 // --- STYLESHEET FUNCTION ---
 const createStyles = (colors: ColorPalette) => StyleSheet.create({
-    contentContainer: {
-    },
     listTitle: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: colors.textPrimary,
         marginBottom: 10,
     },
     addButton: {
@@ -58,20 +59,14 @@ const createStyles = (colors: ColorPalette) => StyleSheet.create({
         alignItems: 'center',
         padding: 15,
         borderRadius: 12,
-        backgroundColor: colors.card,
-        borderWidth: 1,
-        borderColor: colors.border,
+        backgroundColor: colors.primary,
         marginBottom: 20,
         justifyContent: 'center',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.05,
-        shadowRadius: 2,
     },
     addButtonText: {
         fontSize: 16,
         fontWeight: 'bold',
-        color: colors.primary,
+        color: 'white',
         marginLeft: 8,
     },
     
@@ -79,10 +74,10 @@ const createStyles = (colors: ColorPalette) => StyleSheet.create({
     placeItem: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingVertical: 15,
-        borderBottomWidth: StyleSheet.hairlineWidth,
-        borderBottomColor: colors.border,
-        backgroundColor: colors.background,
+        paddingVertical: 16,
+        paddingHorizontal:16,
+        borderRadius:10,
+        marginBottom:10
     },
     placeIcon: {
         fontSize: 24,
@@ -96,7 +91,6 @@ const createStyles = (colors: ColorPalette) => StyleSheet.create({
     placeLabel: {
         fontSize: 16,
         fontWeight: 'bold',
-        color: colors.textPrimary,
     },
     placeAddress: {
         fontSize: 13,
@@ -117,12 +111,7 @@ const createStyles = (colors: ColorPalette) => StyleSheet.create({
         justifyContent: 'flex-end',
     },
     modalContent: {
-        backgroundColor: colors.background,
-        paddingHorizontal: 25,
-        borderTopLeftRadius: 20,
-        borderTopRightRadius: 20,
-        // Height is managed by the KeyboardAvoidingView, but setting maxHeight prevents full screen takeover
-        maxHeight: '80%', 
+        paddingHorizontal: 16,
     },
     modalHeader: {
         flexDirection: 'row',
@@ -133,20 +122,16 @@ const createStyles = (colors: ColorPalette) => StyleSheet.create({
     modalTitle: {
         fontSize: 20,
         fontWeight: 'bold',
-        color: colors.textPrimary,
     },
     // Input Styles (reused from EditAccountInfo)
     inputGroup: { gap: 8, marginBottom: 15 },
-    label: { fontSize: 14, fontWeight: '600', color: colors.textPrimary, marginBottom: 4 },
+    label: { fontSize: 14, fontWeight: '600', marginBottom: 4 },
     input: {
         height: 50,
         borderRadius: 10,
         paddingHorizontal: 15,
         fontSize: 16,
-        backgroundColor: colors.card,
-        color: colors.textPrimary,
-        borderWidth: StyleSheet.hairlineWidth,
-        borderColor: colors.border,
+        borderWidth: 1,
     },
     saveButton: {
         height: 50,
@@ -155,15 +140,17 @@ const createStyles = (colors: ColorPalette) => StyleSheet.create({
         justifyContent: 'center',
         backgroundColor: colors.primary,
         marginTop: 20,
-        marginBottom: 10, // Added margin for spacing inside the scroll view
+        marginBottom: 10,
     },
-    saveButtonText: { color: colors.buttonText, fontSize: 17, fontWeight: 'bold' },
+    saveButtonText: { color: 'white', fontSize: 17, fontWeight: 'bold' },
 });
 
 // --- MAIN COMPONENT ---
 const SavedPlacesScreen: React.FC = () => {
     const { colors } = useTheme();
     const themedStyles = createStyles(colors);
+    const colorScheme = useColorScheme();
+    const colorTheme = colorScheme === 'dark' ? 'dark' : 'light';
     
     const [places, setPlaces] = useState<SavedPlace[]>(MOCK_PLACES);
     const [modalVisible, setModalVisible] = useState(false);
@@ -242,94 +229,70 @@ const SavedPlacesScreen: React.FC = () => {
             visible={modalVisible}
             onRequestClose={() => setModalVisible(false)}
         >
-            {/* 1. KEYBOARD AWARENESS: Wrap the entire modal in KeyboardAvoidingView */}
             <KeyboardAvoidingView
                 style={themedStyles.modalOverlay}
                 keyboardVerticalOffset={0} 
-                // Use platform-specific behavior (important for Android)
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             >
                 <TouchableOpacity 
-                    style={{ flex: 1 }} // Ensure touch covers the whole background
+                    style={{ flex: 1 }}
                     activeOpacity={1}
-                    onPress={() => setModalVisible(false)} // Close modal on outside touch
+                    onPress={() => setModalVisible(false)}
                 >
-                    {/* The modal content that moves up */}
-                    <View 
+                    <ThemedView 
                         style={[
                             themedStyles.modalContent, 
-                            // 2. TAB BAR AVOIDANCE: Add padding for the safe area bottom + extra margin
                             { paddingBottom: insets.bottom + 25, paddingTop: insets.top + 25 } 
                         ]} 
-                        // CRITICAL: Stop the touch event from propagating to the overlay's onPress
                         onStartShouldSetResponder={() => true}
                     >
                         
                         <View style={themedStyles.modalHeader}>
-                            <Text style={themedStyles.modalTitle}>
+                            <ThemedText style={themedStyles.modalTitle}>
                                 {editingPlace ? 'Edit Saved Place' : 'Add New Place'}
-                            </Text>
+                            </ThemedText>
                             <TouchableOpacity onPress={() => setModalVisible(false)}>
-                                <Icon name="close" color={colors.textSecondary} />
+                                <ThemedText style={{fontSize:24}}>x</ThemedText>
                             </TouchableOpacity>
                         </View>
 
                         <ScrollView keyboardShouldPersistTaps="handled">
                             {/* Label Input */}
-                            <View style={themedStyles.inputGroup}>
-                                <Text style={themedStyles.label}>Label (e.g., Office, School)</Text>
+                            <ThemedView style={themedStyles.inputGroup}>
+                                <ThemedText style={themedStyles.label}>Label (e.g., Office, School)</ThemedText>
                                 <TextInput
-                                    style={themedStyles.input}
+                                    style={[themedStyles.input,{borderColor: Colors[colorTheme].textSecondary, color: Colors[colorTheme].text}]}
+                                    placeholderTextColor={Colors[colorTheme].textSecondary}
                                     value={label}
                                     onChangeText={setLabel}
                                     placeholder="Home"
-                                    placeholderTextColor={colors.textSecondary}
                                 />
-                            </View>
+                            </ThemedView>
 
                             {/* Address Input */}
-                            <View style={themedStyles.inputGroup}>
-                                <Text style={themedStyles.label}>Full Address</Text>
+                            <ThemedView style={themedStyles.inputGroup}>
+                                <ThemedText style={themedStyles.label}>Full Address</ThemedText>
                                 <TextInput
-                                    style={themedStyles.input}
+                                    style={[themedStyles.input,{borderColor: Colors[colorTheme].textSecondary, color: Colors[colorTheme].text}]}
+                                    placeholderTextColor={Colors[colorTheme].textSecondary}
                                     value={address}
                                     onChangeText={setAddress}
                                     placeholder="123 Main Street"
-                                    placeholderTextColor={colors.textSecondary}
                                 />
-                            </View>
-                            
-                            {/* Icon Selection (Simple Example) */}
-                            <View style={themedStyles.inputGroup}>
-                                <Text style={themedStyles.label}>Icon</Text>
-                                <View style={{ flexDirection: 'row', gap: 15 }}>
-                                    {['🏠', '💼', '🏫', '🛒', '📍'].map(emoji => (
-                                        <TouchableOpacity 
-                                            key={emoji}
-                                            onPress={() => setIcon(emoji)}
-                                            style={{ 
-                                                padding: 10, 
-                                                borderRadius: 8, 
-                                                backgroundColor: icon === emoji ? colors.primary : colors.card,
-                                            }}
-                                        >
-                                            <Text style={{ fontSize: 24 }}>{emoji}</Text>
-                                        </TouchableOpacity>
-                                    ))}
-                                </View>
-                            </View>
+                            </ThemedView>
                             
                             {/* Save Button */}
                             <TouchableOpacity
                                 style={themedStyles.saveButton}
                                 onPress={handleSave}
+                                activeOpacity={0.8}
                             >
                                 <Text style={themedStyles.saveButtonText}>
                                     {editingPlace ? 'Update Place' : 'Save Place'}
                                 </Text>
                             </TouchableOpacity>
                         </ScrollView>
-                    </View>
+                    </ThemedView>
                 </TouchableOpacity>
             </KeyboardAvoidingView>
         </Modal>
@@ -338,32 +301,32 @@ const SavedPlacesScreen: React.FC = () => {
     // --- RENDER FUNCTION ---
     return (
         <SupportLayout title="Saved Places">
-            <ScrollView contentContainerStyle={themedStyles.contentContainer}>
+            <ScrollView>
                 
                 {/* Add New Place Button */}
                 <TouchableOpacity style={themedStyles.addButton} onPress={() => handleOpenModal(null)}>
-                    <Icon name="add" color={colors.primary} />
+                    <Icon name="add" color='white' />
                     <Text style={themedStyles.addButtonText}>Add New Place</Text>
                 </TouchableOpacity>
 
                 {/* Saved Places List */}
-                <Text style={themedStyles.listTitle}>Your Saved Locations</Text>
+                <ThemedText style={themedStyles.listTitle}>Your Saved Locations</ThemedText>
                 {places.map((place) => (
-                    <View key={place.id} style={themedStyles.placeItem}>
+                    <ThemedView key={place.id} style={themedStyles.placeItem}>
                         <Text style={themedStyles.placeIcon}>{place.icon}</Text>
                         <View style={themedStyles.textContainer}>
-                            <Text style={themedStyles.placeLabel}>{place.label}</Text>
-                            <Text style={themedStyles.placeAddress} numberOfLines={1}>{place.address}</Text>
+                            <ThemedText style={themedStyles.placeLabel}>{place.label}</ThemedText>
+                            <ThemedText style={themedStyles.placeAddress} numberOfLines={1}>{place.address}</ThemedText>
                         </View>
                         <View style={themedStyles.actionsContainer}>
-                            <TouchableOpacity style={themedStyles.actionButton} onPress={() => handleOpenModal(place)}>
+                            <TouchableOpacity activeOpacity={0.8} style={themedStyles.actionButton} onPress={() => handleOpenModal(place)}>
                                 <Icon name="edit" color={colors.textSecondary} />
                             </TouchableOpacity>
-                            <TouchableOpacity style={themedStyles.actionButton} onPress={() => handleDelete(place.id)}>
+                            <TouchableOpacity activeOpacity={0.8} style={themedStyles.actionButton} onPress={() => handleDelete(place.id)}>
                                 <Icon name="delete" color={colors.textSecondary} />
                             </TouchableOpacity>
                         </View>
-                    </View>
+                    </ThemedView>
                 ))}
                 
                 {/* Empty State */}

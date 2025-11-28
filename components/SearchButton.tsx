@@ -4,7 +4,7 @@ import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplet
 import { icons } from "@/constants";
 import { GoogleInputProps } from "@/types/type";
 
-const googlePlacesApiKey = 'AIzaSyDL62h_PZycYs8Xhy02USOC0IXYVZy_QEw'
+const googlePlacesApiKey = process.env.EXPO_PUBLIC_GOOGLE_API_KEY
 
 const LocationSearch = ({
   icon,
@@ -28,7 +28,6 @@ const LocationSearch = ({
             borderRadius: 20,
             marginHorizontal: 20,
             position: "relative",
-            shadowColor: "#d4d4d4",
           },
           textInput: {
             backgroundColor: textInputBackgroundColor
@@ -48,7 +47,6 @@ const LocationSearch = ({
             top: 0,
             width: "100%",
             borderRadius: 10,
-            shadowColor: "#d4d4d4",
             zIndex: 99,
           },
         }}
@@ -67,7 +65,7 @@ const LocationSearch = ({
           <View style={{ justifyContent:'center', alignItems:'center', width:24, height:24 }}>
             <Image
               source={icon ? icon : icons.search}
-              className="w-6 h-6"
+              style={{width:20, height:20}}
               resizeMode="contain"
             />
           </View>
@@ -76,6 +74,7 @@ const LocationSearch = ({
           placeholderTextColor: "gray",
           placeholder: initialLocation ?? "Where do you want to go?",
         }}
+        predefinedPlaces={[]}
       />
     </View>
   );

@@ -118,7 +118,7 @@ const styles = (colors: ColorPalette) => StyleSheet.create({
     metaText: { textAlign: 'center', marginBottom: 2 },
 
     // Card/Breakdown
-    card: { borderRadius: 12, padding: 18, marginBottom: 20, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.08, shadowRadius: 3, elevation: 2 },
+    card: { borderRadius: 12, padding: 18, marginBottom: 20 },
     sectionHeading: { fontSize: 16, fontWeight: 'bold', marginBottom: 15 },
     fareRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 8 },
     fareLabel: { fontSize: 15 },

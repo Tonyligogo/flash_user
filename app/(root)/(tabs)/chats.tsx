@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, StatusBar, useColorScheme } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, useColorScheme } from 'react-native';
 import { useRouter } from 'expo-router';
 import { ColorPalette } from '@/types/type';
 import { useTheme } from '@/constants/ThemeContext';
@@ -8,7 +8,6 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Colors } from '@/constants/theme';
 
-// --- MOCK DATA ---
 interface ChatThread {
     id: string;
     driverName: string;
@@ -41,7 +40,6 @@ const getInitials = (name: string): string => {
 
 const createStyles = (colors: ColorPalette) => StyleSheet.create({
     safeArea: { flex: 1, paddingHorizontal: 16 },
-    container: { flex: 1 },    
     // List Styles
     chatWrapper: {
         paddingVertical:4,
@@ -57,7 +55,8 @@ const createStyles = (colors: ColorPalette) => StyleSheet.create({
     pageTitle: {
         fontSize: 28,
         fontWeight: 'bold',
-        marginVertical: 30,
+        marginTop: 30,
+        marginBottom: 20,
         lineHeight: 34,
       },
     initialAvatar: {
@@ -113,7 +112,6 @@ const createStyles = (colors: ColorPalette) => StyleSheet.create({
     }
 });
 
-// --- RENDER ITEM ---
 const ChatItem: React.FC<{ thread: ChatThread, styles: ReturnType<typeof createStyles>, onPress: () => void }> = ({ thread, styles, onPress }) => {
     const initials = getInitials(thread.driverName);
     const randomIndex = Math.floor(Math.random() * AVATAR_COLORS.length);
@@ -148,22 +146,17 @@ const ChatItem: React.FC<{ thread: ChatThread, styles: ReturnType<typeof createS
     );
 };
 
-// --- MAIN COMPONENT ---
 const ChatsScreen: React.FC = () => {
     const { colors } = useTheme();
     const themedStyles = createStyles(colors);
     const router = useRouter();
-
     const navigateToChat = (id: string) => {
         router.push(`/chat-detail?id=${id}`);
     };
-
     return (
         <SafeAreaView style={themedStyles.safeArea}>
-            
-                    <ThemedText style={[themedStyles.pageTitle]}>Messages</ThemedText>
-            
-            <View style={themedStyles.container}>
+            <ThemedText style={[themedStyles.pageTitle]}>Messages</ThemedText>
+            <View>
                 {mockChats.length === 0 ? (
                     <ThemedText style={themedStyles.noChatsText}>No recent chats found.</ThemedText>
                 ) : (

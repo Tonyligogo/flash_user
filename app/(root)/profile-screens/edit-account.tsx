@@ -1,71 +1,25 @@
 import SupportLayout from '@/components/support-layout';
+import { ThemedText } from '@/components/themed-text';
+import { Colors } from '@/constants/theme';
 import { useTheme } from '@/constants/ThemeContext';
 import { ColorPalette } from '@/types/type';
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, useColorScheme } from 'react-native';
 
 // --- MOCK USER DATA ---
 const MOCK_USER = {
-    firstName: 'Tony',
-    lastName: 'Ligogo',
-    email: 'tony.ligogo@example.com',
+    firstName: 'Flash',
+    lastName: 'User',
+    email: 'flash.user@example.com',
     phone: '+254 712 345 678',
 };
-
-// --- STYLESHEET FUNCTION ---
-const createStyles = (colors: ColorPalette) => StyleSheet.create({
-    contentContainer: {
-        gap: 20,
-    },
-    // Input Group Styles
-    inputGroup: {
-        gap: 8,
-    },
-    label: {
-        fontSize: 14,
-        fontWeight: '600',
-        color: colors.textPrimary,
-        marginBottom: 4,
-    },
-    input: {
-        height: 55,
-        borderRadius: 12,
-        paddingHorizontal: 15,
-        fontSize: 16,
-        // The background color will come from colors.card
-        backgroundColor: colors.card,
-        color: colors.textPrimary,
-        borderWidth: StyleSheet.hairlineWidth,
-        borderColor: colors.border,
-    },
-    // Form Button Styles
-    saveButton: {
-        marginTop: 30,
-        height: 55,
-        borderRadius: 12,
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: colors.accent, // Use accent color for the primary action
-    },
-    saveButtonDisabled: {
-        backgroundColor: colors.border,
-    },
-    saveButtonText: {
-        color: colors.buttonText, // White text for contrast
-        fontSize: 17,
-        fontWeight: 'bold',
-    },
-    // Flex for side-by-side inputs
-    row: {
-        flexDirection: 'row',
-        gap: 10,
-    },
-});
 
 // --- MAIN COMPONENT ---
 const EditAccountInfoScreen: React.FC = () => {
     const { colors } = useTheme();
     const themedStyles = createStyles(colors);
+    const colorScheme = useColorScheme();
+    const colorTheme = colorScheme === 'dark' ? 'dark' : 'light';
 
     const [firstName, setFirstName] = useState(MOCK_USER.firstName);
     const [lastName, setLastName] = useState(MOCK_USER.lastName);
@@ -90,54 +44,48 @@ const EditAccountInfoScreen: React.FC = () => {
         setIsSaving(true);
         console.log('Saving updated account info:', { firstName, lastName, email, phone });
         
-        // --- Simulated API Call ---
         await new Promise(resolve => setTimeout(resolve, 1500)); 
-        // --- End Simulated API Call ---
         
         setIsSaving(false);
-        // In a real app, you would navigate back or show a success message
         console.log('Save successful!');
     };
 
     return (
         <SupportLayout title="Edit Account Info">
-            <ScrollView 
-                contentContainerStyle={themedStyles.contentContainer}
-                keyboardShouldPersistTaps="handled"
-            >
+            <View style={themedStyles.contentContainer}>
                 {/* Name Row */}
                     <View style={themedStyles.inputGroup}>
-                        <Text style={themedStyles.label}>First Name</Text>
+                        <ThemedText style={themedStyles.label}>First Name</ThemedText>
                         <TextInput
-                            style={themedStyles.input}
+                            style={[themedStyles.input,{backgroundColor: Colors[colorTheme].background, color: Colors[colorTheme].text}]}
+                            placeholderTextColor={Colors[colorTheme].textSecondary}
                             value={firstName}
                             onChangeText={setFirstName}
                             placeholder="First Name"
-                            placeholderTextColor={colors.textSecondary}
                             editable={!isSaving}
                         />
                     </View>
                     <View style={themedStyles.inputGroup}>
-                        <Text style={themedStyles.label}>Last Name</Text>
+                        <ThemedText style={themedStyles.label}>Last Name</ThemedText>
                         <TextInput
-                            style={themedStyles.input}
+                            style={[themedStyles.input,{backgroundColor: Colors[colorTheme].background, color: Colors[colorTheme].text}]}
+                            placeholderTextColor={Colors[colorTheme].textSecondary}
                             value={lastName}
                             onChangeText={setLastName}
                             placeholder="Last Name"
-                            placeholderTextColor={colors.textSecondary}
                             editable={!isSaving}
                         />
                     </View>
 
                 {/* Email Input */}
                 <View style={themedStyles.inputGroup}>
-                    <Text style={themedStyles.label}>Email Address</Text>
+                    <ThemedText style={themedStyles.label}>Email Address</ThemedText>
                     <TextInput
-                        style={themedStyles.input}
+                        style={[themedStyles.input,{backgroundColor: Colors[colorTheme].background, color: Colors[colorTheme].text}]}
+                        placeholderTextColor={Colors[colorTheme].textSecondary}
                         value={email}
                         onChangeText={setEmail}
                         placeholder="Email Address"
-                        placeholderTextColor={colors.textSecondary}
                         keyboardType="email-address"
                         autoCapitalize="none"
                         editable={!isSaving}
@@ -146,13 +94,13 @@ const EditAccountInfoScreen: React.FC = () => {
 
                 {/* Phone Input */}
                 <View style={themedStyles.inputGroup}>
-                    <Text style={themedStyles.label}>Phone Number</Text>
+                    <ThemedText style={themedStyles.label}>Phone Number</ThemedText>
                     <TextInput
-                        style={themedStyles.input}
+                        style={[themedStyles.input,{backgroundColor: Colors[colorTheme].background, color: Colors[colorTheme].text}]}
+                        placeholderTextColor={Colors[colorTheme].textSecondary}
                         value={phone}
                         onChangeText={setPhone}
                         placeholder="Phone Number"
-                        placeholderTextColor={colors.textSecondary}
                         keyboardType="phone-pad"
                         editable={!isSaving}
                     />
@@ -162,19 +110,60 @@ const EditAccountInfoScreen: React.FC = () => {
                 <TouchableOpacity
                     style={[
                         themedStyles.saveButton,
-                        isSubmitDisabled && themedStyles.saveButtonDisabled,
                     ]}
                     onPress={handleSave}
                     disabled={isSubmitDisabled}
+                    activeOpacity={0.8}
                 >
                     <Text style={themedStyles.saveButtonText}>
                         {isSaving ? 'Saving...' : 'Save Changes'}
                     </Text>
                 </TouchableOpacity>
 
-            </ScrollView>
+            </View>
         </SupportLayout>
     );
 };
+
+// --- STYLESHEET FUNCTION ---
+const createStyles = (colors: ColorPalette) => StyleSheet.create({
+    contentContainer: {
+        gap: 20,
+    },
+    // Input Group Styles
+    inputGroup: {
+        gap: 8,
+    },
+    label: {
+        fontSize: 14,
+        fontWeight: '600',
+        marginBottom: 4,
+    },
+    input: {
+        height: 55,
+        borderRadius: 12,
+        paddingHorizontal: 15,
+        fontSize: 16,
+    },
+    // Form Button Styles
+    saveButton: {
+        marginTop: 30,
+        height: 55,
+        borderRadius: 12,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: colors.primary,
+    },
+    saveButtonText: {
+        color: 'white',
+        fontSize: 17,
+        fontWeight: 'bold',
+    },
+    // Flex for side-by-side inputs
+    row: {
+        flexDirection: 'row',
+        gap: 10,
+    },
+});
 
 export default EditAccountInfoScreen;

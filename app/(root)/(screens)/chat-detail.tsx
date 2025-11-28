@@ -1,9 +1,11 @@
 import React, { useMemo } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import { Stack, useLocalSearchParams } from 'expo-router';
+import { View, Text, StyleSheet, useColorScheme } from 'react-native';
+import { useLocalSearchParams } from 'expo-router';
 import { ColorPalette } from '@/types/type';
 import { useTheme } from '@/constants/ThemeContext';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { ThemedText } from '@/components/themed-text';
+import SupportLayout from '@/components/support-layout';
+import { Colors } from '@/constants/theme';
 
 // --- MOCK DATA ---
 interface Message {
@@ -43,7 +45,7 @@ const mockChatHistory: ChatHistory[] = [
 
 // --- THEMED STYLESHEET FUNCTION ---
 const createStyles = (colors: ColorPalette) => StyleSheet.create({
-    safeArea: { flex: 1, backgroundColor: colors.background },
+    safeArea: { flex: 1 },
     container: { flex: 1 },
     messageBubble: {
         maxWidth: '75%',
@@ -60,8 +62,6 @@ const createStyles = (colors: ColorPalette) => StyleSheet.create({
         alignSelf: 'flex-start',
         backgroundColor: colors.card,
         borderBottomLeftRadius: 5,
-        borderColor: colors.border,
-        borderWidth: StyleSheet.hairlineWidth,
     },
     messageText: {
         fontSize: 16,
@@ -93,12 +93,15 @@ const createStyles = (colors: ColorPalette) => StyleSheet.create({
 // --- MESSAGE BUBBLE COMPONENT ---
 const MessageBubble: React.FC<{ message: Message, styles: ReturnType<typeof createStyles>, colors: ColorPalette }> = ({ message, styles, colors }) => {
     const isUser = message.sender === 'user';
+    const colorScheme = useColorScheme();
+    const inputTheme = colorScheme === "dark" ? "dark" : "light";
     return (
         <View style={[
             styles.messageBubble, 
             isUser ? styles.userMessage : styles.driverMessage,
+            isUser ? {} : {backgroundColor:Colors[inputTheme].background}
         ]}>
-            <Text style={isUser ? styles.userText : styles.driverText}>
+            <Text style={isUser ? styles.userText : inputTheme === "dark" ? {color:'white'}:{color:'black'}}>
                 {message.text}
             </Text>
             <Text style={[styles.timestamp, { color: isUser ? 'white' : colors.textSecondary }]}>
@@ -123,48 +126,24 @@ const ChatDetailScreen: React.FC = () => {
 
     if (!chatData) {
         return (
-            <SafeAreaView style={themedStyles.safeArea}>
-                <Stack.Screen 
-                options={{ 
-                    headerShown: true, 
-                    headerStyle: { backgroundColor: colors.background },
-                    headerTitle: 'Chat not found!',
-                    headerTitleStyle: { color: colors.textPrimary },
-                }} 
-            />
-                <Text style={{ color: colors.textPrimary, paddingHorizontal:16 }}>Chat history for ID: {chatId} not found.</Text>
-            </SafeAreaView>
+            <SupportLayout title='Chat not found!'>
+            <ThemedText>Chat history for ID: {chatId} not found.</ThemedText>
+        </SupportLayout>
         );
     }
     
     return (
-        <SafeAreaView style={themedStyles.safeArea}>
-            <Stack.Screen 
-                options={{ 
-                    headerShown: true, 
-                    headerStyle: { backgroundColor: colors.background },
-                    headerTitle: `Chat with ${driverName}`,
-                    headerTitleStyle: { color: colors.textPrimary },
-                }} 
-            />
-
-            <View style={themedStyles.container}>                
-                {/* Message List */}
-                <ScrollView 
-                    style={{ paddingHorizontal: 10 }}
-                    contentContainerStyle={{ flexGrow: 1 }}
-                >
-                    {chatData.messages.map(message => (
-                        <MessageBubble 
-                            key={message.id} 
-                            message={message} 
-                            styles={themedStyles} 
-                            colors={colors}
-                        />
-                    ))}
-                </ScrollView>
-            </View>
-        </SafeAreaView>
+        <SupportLayout title={`Chat with ${driverName}`}>
+            <>
+            {chatData.messages.map(message => (
+                         <MessageBubble 
+                             key={message.id} 
+                             message={message} 
+                             styles={themedStyles} 
+                             colors={colors}
+                         />
+                     ))}</>
+        </SupportLayout>
     );
 };
 

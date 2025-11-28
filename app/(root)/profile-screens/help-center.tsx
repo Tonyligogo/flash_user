@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, useColorScheme } from 'react-native';
 import { useTheme } from '@/constants/ThemeContext';
 import SupportLayout from '@/components/support-layout';
 import { ColorPalette } from '@/types/type';
+import { ThemedView } from '@/components/themed-view';
+import { ThemedText } from '@/components/themed-text';
+import { Colors } from '@/constants/theme';
 
 // --- ICON PLACEHOLDER ---
 const Icon = ({ name, color, size = 20 }: { name: string; color: string; size?: number }) => {
@@ -88,6 +91,8 @@ const helpTopics: HelpTopic[] = [
 const HelpCenterScreen: React.FC = () => {
     const { colors } = useTheme();
     const themedStyles = styles(colors);
+     const colorScheme = useColorScheme();
+        const colorTheme = colorScheme === 'dark' ? 'dark' : 'light';
 
     // State to track which topic is currently expanded
     const [expandedTopic, setExpandedTopic] = useState<string | null>(null);
@@ -101,12 +106,12 @@ const HelpCenterScreen: React.FC = () => {
     const renderSubtopic = (sub: HelpTopic, index: number) => (
         <View 
             key={index}
-            style={[themedStyles.subtopicItem, { borderBottomColor: colors.border }]}
+            style={[themedStyles.subtopicItem, { borderBottomColor: Colors[colorTheme].textSecondary }]}
         >
-            <Text style={[themedStyles.subtopicTitle, { color: colors.textPrimary }]}>
+            <ThemedText style={[themedStyles.subtopicTitle]}>
                 {sub.label}
-            </Text>
-            <Text style={[themedStyles.subtopicDescription, { color: colors.textSecondary }]}>
+            </ThemedText>
+            <Text style={[themedStyles.subtopicDescription, { color: Colors[colorTheme].icon }]}>
                 {sub.description}
             </Text>
         </View>
@@ -116,29 +121,29 @@ const HelpCenterScreen: React.FC = () => {
         const isExpanded = topic.label === expandedTopic;
         
         return (
-            <View key={index} style={themedStyles.topicContainer}>
+            <ThemedView key={index} style={themedStyles.topicContainer}>
                 {/* Expandable Header */}
                 <TouchableOpacity 
-                    style={[themedStyles.topicHeader, { backgroundColor: colors.card, borderBottomColor: colors.border }]}
+                    style={[themedStyles.topicHeader]}
                     onPress={() => toggleExpansion(topic.label)}
-                    activeOpacity={10}
+                    activeOpacity={0.8}
                 >
-                    <Text style={[themedStyles.topicTitle, { color: colors.textPrimary }]}>
+                    <ThemedText style={[themedStyles.topicTitle]}>
                         {topic.label}
-                    </Text>
+                    </ThemedText>
                     <Icon 
                         name={isExpanded ? 'chevron-up' : 'chevron-down'} 
-                        color={colors.textPrimary} 
+                        color={Colors[colorTheme].text} 
                     />
                 </TouchableOpacity>
 
                 {/* Subtopics List */}
                 {isExpanded && (
-                    <View style={[themedStyles.subtopicsList, { backgroundColor: colors.background }]}>
+                    <ThemedView style={[themedStyles.subtopicsList]}>
                         {topic.subtopics?.map(renderSubtopic)}
-                    </View>
+                    </ThemedView>
                 )}
-            </View>
+            </ThemedView>
         );
     };
 
@@ -154,6 +159,7 @@ const HelpCenterScreen: React.FC = () => {
                 <TouchableOpacity
                     style={[themedStyles.contactButton, { backgroundColor: colors.primary }]}
                     onPress={() => console.log('Initiate Live Chat or Call')}
+                    activeOpacity={0.8}
                 >
                     <Text style={themedStyles.contactButtonText}>
                         Contact Support (24/7)
@@ -175,11 +181,6 @@ const styles = (colors: ColorPalette) => StyleSheet.create({
         borderRadius: 12,
         overflow: 'hidden',
         marginHorizontal:4,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.05,
-        shadowRadius: 2,
-        elevation: 1,
     },
     topicHeader: {
         flexDirection: 'row',
@@ -187,10 +188,9 @@ const styles = (colors: ColorPalette) => StyleSheet.create({
         alignItems: 'center',
         paddingVertical: 18,
         paddingHorizontal:16,
-        borderBottomWidth: StyleSheet.hairlineWidth,
     },
     topicTitle: {
-        fontSize: 20,
+        fontSize: 18,
         fontWeight: '500',
         flex: 1,
     },
@@ -207,12 +207,11 @@ const styles = (colors: ColorPalette) => StyleSheet.create({
         borderBottomWidth: StyleSheet.hairlineWidth,
     },
     subtopicTitle: {
-        fontSize: 19,
-        fontWeight: '600',
+        fontSize: 18,
         marginBottom: 4,
     },
     subtopicDescription: {
-        fontSize: 18,
+        fontSize: 17,
     },
 
     // Contact Button

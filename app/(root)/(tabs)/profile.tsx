@@ -4,20 +4,21 @@ import {
   Text,
   Image,
   ScrollView,
-  StatusBar,
   StyleSheet,
   TouchableOpacity,
+  useColorScheme,
 } from 'react-native';
 
-// --- IMPORTS ---
 import { MenuItem, MenuSection, IconProps, UserProfile, ColorPalette } from '@/types/type'; 
 import { useTheme } from '@/constants/ThemeContext';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
+import { ThemedText } from '@/components/themed-text';
+import { ThemedView } from '@/components/themed-view';
+import { Colors } from '@/constants/theme';
 
-// --- MOCK DATA ---
 const user: UserProfile = {
-  name: 'Tony Ligogo',
+  name: 'Flash User',
   profilePic: 'https://i.pravatar.cc/100?img=68', 
 };
 
@@ -63,14 +64,12 @@ const Icon: React.FC<IconProps> = ({ name, size = 24, color }) => {
   return <Text style={{ fontSize: size * 0.75, color: color }}>{emojiMap[name] || '?'}</Text>;
 };
 
-// --- MAIN COMPONENT ---
 const Profile: React.FC = () => {
   const { colors } = useTheme();
-
-  // Initialize dynamic styles with current theme colors
+  const colorScheme = useColorScheme();
+  const colorTheme = colorScheme === 'dark' ? 'dark' : 'light';
   const themedStyles = styles(colors);
 
-  // --- HANDLERS ---
   const handlePress = (action: string): void => {
      switch (action) {
           case 'edit_account':
@@ -103,19 +102,18 @@ const Profile: React.FC = () => {
         }
   };
 
-  // --- RENDERING HELPERS ---
   const renderMenuItem = (item: MenuItem, index: number, total: number) => (
     <TouchableOpacity
       key={index}
       style={[
         themedStyles.menuItem,
-        { borderBottomColor: index < total - 1 ? colors.border : 'transparent' },
+        { borderBottomColor: index < total - 1 ? Colors[colorTheme].icon : 'transparent' },
       ]}
       onPress={() => handlePress(item.action)}
     >
       <View style={themedStyles.menuItemLeft}>
         <Icon name={item.icon} color={colors.textPrimary} />
-        <Text style={[themedStyles.menuItemText, { color: colors.textPrimary }]}>{item.label}</Text>
+        <ThemedText style={[themedStyles.menuItemText]}>{item.label}</ThemedText>
       </View>
       <Icon name="chevron-right" size={18} color={colors.textSecondary} />
     </TouchableOpacity>
@@ -123,39 +121,34 @@ const Profile: React.FC = () => {
 
   const renderMenuSection = (section: MenuSection, sectionIndex: number) => (
     <View key={sectionIndex} style={themedStyles.sectionContainer}>
-      <Text style={[themedStyles.sectionTitle, { color: colors.textSecondary }]}>
+      <ThemedText style={[themedStyles.sectionTitle]}>
         {section.title.toUpperCase()}
-      </Text>
-      <View style={[themedStyles.card, { backgroundColor: colors.card }]}>
+      </ThemedText>
+      <ThemedView style={[themedStyles.card]}>
         {section.items.map((item, index) =>
           renderMenuItem(item, index, section.items.length)
         )}
-      </View>
+      </ThemedView>
     </View>
   );
 
   return (
     // Set background color from theme
-    <SafeAreaView style={[themedStyles.safeArea, { backgroundColor: colors.background }]}>
+    <SafeAreaView style={[themedStyles.safeArea]}>
       <ScrollView
-        style={themedStyles.scrollView}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={themedStyles.contentContainer}
       >
-        <StatusBar barStyle={themedStyles.pageTitle.color === '#E0E0E0' ? 'light-content' : 'dark-content'} />
-
-        <Text style={[themedStyles.pageTitle, { color: colors.textPrimary }]}>Profile</Text>
+        <ThemedText style={[themedStyles.pageTitle]}>Profile</ThemedText>
 
         {/* 1. User Header Card */}
-        <View style={[themedStyles.userCard, { backgroundColor: colors.card }]}>
+        <ThemedView style={[themedStyles.userCard]}>
           <Image 
             source={{ uri: user.profilePic }} 
             style={themedStyles.profileImage}
           />
-          <View style={themedStyles.userInfo}>
-            <Text style={[themedStyles.userName, { color: colors.textPrimary }]}>{user.name}</Text>
-          </View>
-        </View>
+            <ThemedText style={[themedStyles.userName]}>{user.name}</ThemedText>
+        </ThemedView>
 
         {/* 2. Menu Sections */}
         {menuSections.map(renderMenuSection)}
@@ -165,8 +158,9 @@ const Profile: React.FC = () => {
             <TouchableOpacity 
                 style={[themedStyles.logoutButton, { borderColor: colors.border }]} 
                 onPress={() => handlePress('logout')}
+                activeOpacity={0.8}
             >
-                <Text style={[themedStyles.logoutText, { color: colors.textPrimary }]}>Sign Out</Text>
+                <ThemedText style={[themedStyles.logoutText]}>Sign Out</ThemedText>
             </TouchableOpacity>
             <Text style={[themedStyles.appVersion, { color: colors.textSecondary }]}>
               App by Corban Technologies
@@ -182,48 +176,32 @@ const styles = (colors: ColorPalette) => StyleSheet.create({
   safeArea: {
     flex: 1,
   },
-  scrollView: {
-    flex: 1,
-  },
   contentContainer: {
+    paddingVertical:30,
     paddingHorizontal: 16,
-    paddingBottom: 40,
-    paddingTop: (StatusBar.currentHeight || 0),
   },
   pageTitle: {
-    fontSize: 34,
+    fontSize: 28,
     fontWeight: 'bold',
     marginBottom: 20,
-    color:'#E0E0E0',
   },
   
-  // --- User Card Styles ---
   userCard: {
     flexDirection: 'row',
     alignItems: 'center',
     padding: 18,
     borderRadius: 16,
     marginBottom: 25,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 }, 
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 5,
   },
   profileImage: {
     width: 70,
     height: 70,
     borderRadius: 35,
     marginRight: 18,
-    backgroundColor: colors.border,
   },
   tinyLogo: {
     width: 50,
     height: 50,
-  },
-  userInfo: {
-    flex: 1,
-    justifyContent: 'center',
   },
   userName: {
     fontSize: 22,
@@ -261,11 +239,6 @@ const styles = (colors: ColorPalette) => StyleSheet.create({
   card: {
     borderRadius: 16,
     overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
-    elevation: 3,
   },
   menuItem: {
     flexDirection: 'row',

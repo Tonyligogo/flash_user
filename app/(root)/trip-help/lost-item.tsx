@@ -1,16 +1,19 @@
 import React, { useState } from 'react';
 import {
-  View,
   Text,
   StyleSheet,
   TouchableOpacity,
   TextInput,
   ActivityIndicator,
+  useColorScheme,
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useTheme } from '@/constants/ThemeContext';
 import SupportLayout from '@/components/support-layout';
 import { ColorPalette } from '@/types/type';
+import { ThemedText } from '@/components/themed-text';
+import { ThemedView } from '@/components/themed-view';
+import { Colors } from '@/constants/theme';
 
 // --- MOCK DRIVER CONTACT INFO (For illustration) ---
 const DRIVER_NAME = "Mercy A.";
@@ -21,6 +24,8 @@ const LostItemScreen: React.FC = () => {
     const { colors } = useTheme();
     const themedStyles = { ...CommonStyles(colors), ...localStyles(colors) };
     const router = useRouter();
+    const colorScheme = useColorScheme();
+    const inputTheme = colorScheme === 'dark' ? 'dark' : 'light';
     const params = useLocalSearchParams();
     const rideId = params.rideId as string;
     
@@ -38,13 +43,10 @@ const LostItemScreen: React.FC = () => {
         setIsSubmitting(true);
         console.log(`Submitting Lost Item for Ride ${rideId}: ${itemDescription}`);
 
-        // --- Simulated API Call ---
         await new Promise(resolve => setTimeout(resolve, 2000)); 
-        // --- End Simulated API Call ---
 
         setIsSubmitting(false);
         
-        // Show confirmation message (in a modal) and navigate back
         router.back(); 
     };
 
@@ -53,13 +55,13 @@ const LostItemScreen: React.FC = () => {
             title="Lost Item" 
             isSubmitting={isSubmitting}
         >
-            <Text style={[themedStyles.heading, { color: colors.textPrimary }]}>
+            <ThemedText style={[themedStyles.heading]}>
                 Try Contacting Your Driver
-            </Text>
+            </ThemedText>
             
             {/* Driver Contact Card */}
-            <View style={[themedStyles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
-                <Text style={[themedStyles.driverName, { color: colors.textPrimary }]}>{DRIVER_NAME}</Text>
+            <ThemedView style={[themedStyles.card]}>
+                <ThemedText style={[themedStyles.driverName]}>{DRIVER_NAME}</ThemedText>
                 <Text style={[themedStyles.driverText, { color: colors.textSecondary }]}>
                     Call this number within 24 hours to speak to your driver about the lost item.
                 </Text>
@@ -67,27 +69,26 @@ const LostItemScreen: React.FC = () => {
                 <TouchableOpacity style={[themedStyles.callButton, { backgroundColor: colors.primary }]}>
                     <Text style={themedStyles.callButtonText}>Call {MOCK_PHONE}</Text>
                 </TouchableOpacity>
-            </View>
+            </ThemedView>
 
-            <Text style={[themedStyles.subHeading, { color: colors.textPrimary }]}>
+            <ThemedText style={[themedStyles.subHeading]}>
                 What did you leave behind?
-            </Text>
+            </ThemedText>
 
             <TextInput
                 style={[
                     themedStyles.textInput, 
-                    { 
-                        backgroundColor: colors.card,
-                        color: colors.textPrimary,
-                        borderColor: colors.border,
-                    }
+                    {
+                                backgroundColor: Colors[inputTheme].background,
+                                color: Colors[inputTheme].text,
+                              },
                 ]}
                 multiline
                 numberOfLines={6}
                 value={itemDescription}
                 onChangeText={setItemDescription}
                 placeholder="E.g., A black backpack with a red stripe, left in the back seat."
-                placeholderTextColor={colors.textSecondary}
+                placeholderTextColor={Colors[inputTheme].textSecondary}
                 editable={!isSubmitting}
             />
 
@@ -95,7 +96,7 @@ const LostItemScreen: React.FC = () => {
             <TouchableOpacity 
                 style={[
                     themedStyles.submitButton, 
-                    { backgroundColor: isSubmitting || !itemDescription.trim() ? colors.border : colors.primary }
+                    { backgroundColor: Colors[inputTheme].primary }
                 ]}
                 onPress={handleSubmit}
                 disabled={isSubmitting || !itemDescription.trim()}
@@ -119,12 +120,6 @@ const CommonStyles = (colors: ColorPalette) => StyleSheet.create ({
     card: {
         padding: 18,
         borderRadius: 12,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.08,
-        shadowRadius: 3,
-        elevation: 2,
-        borderWidth: StyleSheet.hairlineWidth,
         marginBottom: 20,
     },
     textInput: {
@@ -132,7 +127,6 @@ const CommonStyles = (colors: ColorPalette) => StyleSheet.create ({
         height: 120,
         borderRadius: 12,
         padding: 15,
-        borderWidth: 1,
         fontSize: 16,
         textAlignVertical: 'top',
         marginBottom: 20,
@@ -156,6 +150,7 @@ const localStyles = (colors: ColorPalette) => StyleSheet.create({
         fontSize: 24,
         fontWeight: 'bold',
         marginBottom: 10,
+        lineHeight:48
     },
     subHeading: {
         fontSize: 18,

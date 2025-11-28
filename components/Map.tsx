@@ -3,12 +3,15 @@ import { calculateRegion, generateMarkersFromData } from '@/lib/map';
 import { useDriverStore, useLocationStore } from '@/store';
 import { MarkerData } from '@/types/type';
 import React, { useEffect, useState } from 'react';
+import { useColorScheme } from 'react-native';
 import MapView, { Marker, PROVIDER_DEFAULT} from 'react-native-maps';
 
-export default function App() {
+export default function Map() {
     const {
         userLongitude, userLatitude, destinationLatitude, destinationLongitude
     } = useLocationStore();
+    const colorScheme = useColorScheme();
+    const colorTheme = colorScheme === 'dark' ? 'dark' : 'light';
 
     const {selectedDriver, setDrivers} = useDriverStore();
     const [markers, setMarkers] = useState<MarkerData[]>([]);
@@ -37,7 +40,7 @@ export default function App() {
       mapType='standard'
       showsPointsOfInterest={false}
       showsUserLocation={true}
-      userInterfaceStyle='dark'
+      userInterfaceStyle={colorTheme}
       style={{flex:1}}
       initialRegion={region}
       >

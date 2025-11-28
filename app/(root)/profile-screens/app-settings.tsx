@@ -1,4 +1,7 @@
 import SupportLayout from '@/components/support-layout';
+import { ThemedText } from '@/components/themed-text';
+import { ThemedView } from '@/components/themed-view';
+import { Colors } from '@/constants/theme';
 import { useTheme } from '@/constants/ThemeContext';
 import { ColorPalette } from '@/types/type';
 import React, { useState } from 'react';
@@ -9,6 +12,7 @@ import {
     ScrollView, 
     TouchableOpacity, 
     Switch,
+    useColorScheme,
 } from 'react-native';
 
 // --- HELPER ICONS (Placeholder) ---
@@ -31,17 +35,12 @@ const createStyles = (colors: ColorPalette) => StyleSheet.create({
         marginBottom: 10,
         padding: 15,
         borderRadius: 12,
-        backgroundColor: colors.card,
-        borderWidth: StyleSheet.hairlineWidth,
-        borderColor: colors.border,
     },
     sectionTitle: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: colors.textPrimary,
         paddingBottom: 10,
         borderBottomWidth: StyleSheet.hairlineWidth,
-        borderBottomColor: colors.border,
         marginBottom: 5,
     },
     settingItem: {
@@ -57,7 +56,6 @@ const createStyles = (colors: ColorPalette) => StyleSheet.create({
     },
     settingLabel: {
         fontSize: 16,
-        color: colors.textPrimary,
         fontWeight: '500',
     },
     settingDescription: {
@@ -98,6 +96,8 @@ const createStyles = (colors: ColorPalette) => StyleSheet.create({
 const AppSettingsScreen: React.FC = () => {
     const { colors, theme, setTheme } = useTheme();
     const themedStyles = createStyles(colors);
+    const colorScheme = useColorScheme();
+    const colorTheme = colorScheme === 'dark' ? 'dark' : 'light';
     
     // Local states for toggles
     const [pushNotifications, setPushNotifications] = useState(true);
@@ -112,14 +112,14 @@ const AppSettingsScreen: React.FC = () => {
             <ScrollView contentContainerStyle={themedStyles.contentContainer}>
                 
                 {/* 1. Theme and Appearance */}
-                <View style={themedStyles.sectionContainer}>
-                    <Text style={themedStyles.sectionTitle}>Appearance</Text>
+                <ThemedView style={themedStyles.sectionContainer}>
+                    <ThemedText style={[themedStyles.sectionTitle, {borderBottomColor:Colors[colorTheme].textSecondary}]}>Appearance</ThemedText>
                     
                     <View style={themedStyles.settingItem}>
                         <View style={themedStyles.textContainer}>
                             <Icon name="theme" color={colors.textPrimary} />
                             <View>
-                                <Text style={themedStyles.settingLabel}>App Theme</Text>
+                                <ThemedText style={themedStyles.settingLabel}>App Theme</ThemedText>
                                 <Text style={themedStyles.settingDescription}>Change between Light, Dark, or System mode.</Text>
                             </View>
                         </View>
@@ -129,34 +129,35 @@ const AppSettingsScreen: React.FC = () => {
                         {/* Light Mode Button */}
                         <TouchableOpacity
                             onPress={() => handleThemeChange('light')}
+                            activeOpacity={0.8}
                             style={[
                                 themedStyles.themeButton,
                                 theme === 'light' && themedStyles.themeButtonActive
                             ]}
                         >
-                            <Text style={[
+                            <ThemedText style={[
                                 themedStyles.themeButtonText,
-                                { color: theme === 'light' ? colors.buttonText : colors.textPrimary }
-                            ]}>Light</Text>
+                            ]}>Light</ThemedText>
                         </TouchableOpacity>
 
                         {/* Dark Mode Button */}
                         <TouchableOpacity
                             onPress={() => handleThemeChange('dark')}
+                            activeOpacity={0.8}
                             style={[
                                 themedStyles.themeButton,
                                 theme === 'dark' && themedStyles.themeButtonActive
                             ]}
                         >
-                            <Text style={[
+                            <ThemedText style={[
                                 themedStyles.themeButtonText,
-                                { color: theme === 'dark' ? colors.buttonText : colors.textPrimary }
-                            ]}>Dark</Text>
+                            ]}>Dark</ThemedText>
                         </TouchableOpacity>
                         
                         {/* System Mode Button */}
                         <TouchableOpacity
                             onPress={() => handleThemeChange('system')}
+                            activeOpacity={0.8}
                             style={[
                                 themedStyles.themeButton,
                                 theme === 'system' && themedStyles.themeButtonActive
@@ -164,48 +165,55 @@ const AppSettingsScreen: React.FC = () => {
                         >
                             <Text style={[
                                 themedStyles.themeButtonText,
-                                { color: theme === 'system' ? colors.buttonText : colors.textPrimary }
+                                { color: 'white' }
                             ]}>System</Text>
                         </TouchableOpacity>
                     </View>
-                </View>
+                </ThemedView>
 
                 {/* 2. Notifications and Sounds */}
-                <View style={themedStyles.sectionContainer}>
-                    <Text style={themedStyles.sectionTitle}>Alerts</Text>
+                <ThemedView style={themedStyles.sectionContainer}>
+                    <ThemedText style={[themedStyles.sectionTitle, {borderBottomColor:Colors[colorTheme].textSecondary}]}>Alerts</ThemedText>
                     
                     <View style={themedStyles.settingItem}>
                         <View style={themedStyles.textContainer}>
                             <Icon name="notifications" color={colors.textPrimary} />
-                            <View>
-                                <Text style={themedStyles.settingLabel}>Push Notifications</Text>
-                                <Text style={themedStyles.settingDescription}>Receive alerts for trip status and offers.</Text>
-                            </View>
-                        </View>
-                        <Switch
-                            trackColor={{ false: colors.border, true: colors.accent }}
-                            thumbColor={colors.buttonText}
+                            <View style={{flex:1}}>
+                            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
+                                <ThemedText style={themedStyles.settingLabel}>Push Notifications</ThemedText>
+                                <Switch
+                            trackColor={{ false: colors.textSecondary, true: colors.accent }}
+                            thumbColor={colors.card}
+                            ios_backgroundColor={colors.textSecondary}
                             onValueChange={setPushNotifications}
                             value={pushNotifications}
                         />
-                    </View>
-                    
-                    <View style={[themedStyles.settingItem, { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.border }]}>
-                        <View style={themedStyles.textContainer}>
-                            <Icon name="sound" color={colors.textPrimary} />
-                            <View>
-                                <Text style={themedStyles.settingLabel}>In-App Sounds</Text>
-                                <Text style={themedStyles.settingDescription}>Play sounds for new messages and trip status changes.</Text>
+                            </View>
+                                <ThemedText style={themedStyles.settingDescription}>Receive alerts for trip status and offers.</ThemedText>
                             </View>
                         </View>
-                        <Switch
-                            trackColor={{ false: colors.border, true: colors.accent }}
-                            thumbColor={colors.buttonText}
-                            onValueChange={setInAppSound}
-                            value={inAppSound}
-                        />
+                        
                     </View>
-                </View>
+                    
+                    <View style={[themedStyles.settingItem, { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: Colors[colorTheme].textSecondary }]}>
+                        <View style={themedStyles.textContainer}>
+                            <Icon name="sound" color={colors.textPrimary} />
+                            <View style={{flex:1}}>
+                            <View style={{flex:1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
+                                <ThemedText style={themedStyles.settingLabel}>In-App Sounds</ThemedText>
+                                <Switch
+                                    trackColor={{ false: colors.textSecondary, true: colors.accent }}
+                        thumbColor={colors.card}
+                        ios_backgroundColor={colors.textSecondary}
+                        onValueChange={setInAppSound}
+                                    value={inAppSound}
+                                />
+                            </View>
+                                <ThemedText style={themedStyles.settingDescription}>Play sounds for new messages and trip status changes.</ThemedText>
+                            </View>
+                        </View>
+                    </View>
+                </ThemedView>
                 
                 <Text style={themedStyles.smallText}>
                     Settings are saved automatically. Some changes may require an app restart.

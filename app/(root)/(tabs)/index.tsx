@@ -1,14 +1,15 @@
-import { Image, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { FlatList, Image, StyleSheet, Text, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { icons, images } from '@/constants'
-import GoogleTextInput from '@/components/GoogleTextInput'
 import { useLocationStore } from '@/store'
 import * as Location from 'expo-location';
 import { ColorPalette } from '@/types/type'
 import { useTheme } from '@/constants/ThemeContext'
 import { ThemedView } from '@/components/themed-view'
 import { ThemedText } from '@/components/themed-text'
+import SearchInput from '@/components/SearchInput'
+import { router } from 'expo-router'
 
 const RecentRides = [
   {
@@ -34,17 +35,20 @@ const Icon = ({ name}: { name: string}) => {
       'mall':'🏬',
       'fun':'🍻'
   };
-  return <Text style={[{ fontSize: 24 }, name === 'new' ? {color:'white', fontSize:30} : {} ]}>{emojiMap[name] || '?'}</Text>;
+  return <Text style={{ fontSize: 24 }}>{emojiMap[name] || '?'}</Text>;
 };
 
 const Index = () => {
   const { colors } = useTheme();
   const themedStyles = createStyles(colors);
 
-  const {setUserLocation} = useLocationStore();
+  const {setUserLocation, setDestinationLocation} = useLocationStore();
   const [hasPermissions, setHasPermissions] = useState(false);
   
-  const handleDestinationSearch = () =>{}
+  const handleDestinationSearch = (location:{latitude:number,longitude:number,address:string}) =>{
+    setDestinationLocation(location)
+    router.push("/(root)/(screens)/find-ride")
+  }
 
   useEffect(()=>{
     const requestLocation = async()=>{
@@ -81,53 +85,80 @@ const Index = () => {
   
   return (
     <SafeAreaView style={themedStyles.safeArea}>
-      <ScrollView contentContainerStyle={themedStyles.contentContainer} showsVerticalScrollIndicator={false}>
-          {/* Header/Greeting Section */}
-          <View style={themedStyles.headerRow}>
-            <View style={themedStyles.userInfo}>
-              <Image source={images.userLogo} style={themedStyles.userLogo} />
+      <FlatList
+        data={RecentRides}
+        keyExtractor={(item) => item.id.toString()}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={themedStyles.contentContainer}
+        keyboardShouldPersistTaps="always"
+
+        // ------------- HEADER -------------
+        ListHeaderComponent={
+          <>
+            {/* Header/Greeting Section */}
+            <View style={themedStyles.headerRow}>
               <View>
-                <ThemedText style={[themedStyles.greeting]}>Flash user 👋</ThemedText>
-                <ThemedText style={[themedStyles.subtitle, { color: colors.textSecondary }]}>Anywhere in a flash</ThemedText>
+                <ThemedText style={[themedStyles.greeting]}>Hello, Immanuel 👋</ThemedText>
+                <ThemedText style={[themedStyles.subtitle, { color: colors.textSecondary }]}>
+                  Anywhere in a flash
+                </ThemedText>
               </View>
+              <Image source={images.userLogo} style={themedStyles.userLogo} />
             </View>
-          </View>
 
-          {/* Search Input */}
-          <GoogleTextInput
-            icon={icons.search}
-            textInputBackgroundColor={colors.card}
-            handlePress={handleDestinationSearch}
-          />
-          <View style={{marginTop:20}}>
-            {RecentRides.map((ride)=>(
-              <ThemedView key={ride.id} style={themedStyles.recentRide}>
-                <Image source={icons.pin} resizeMode="contain" style={{width:20, height:20}}/>
-                <View>
-                  <ThemedText style={{fontSize:16, fontWeight:'600'}}>{ride.name}</ThemedText>
-                  <ThemedText style={{fontSize:14, color:colors.textSecondary}}>{ride.address}</ThemedText>
-                </View>
+            {/* Search */}
+            <SearchInput
+              handleSearch={handleDestinationSearch}
+            />
+
+            {/* Section Title */}
+            <ThemedText style={[themedStyles.sectionTitle, { marginTop: 20 }]}>
+              Recent Rides
+            </ThemedText>
+          </>
+        }
+
+        // ------------- EACH RIDE ITEM -------------
+        renderItem={({ item }) => (
+          <ThemedView style={themedStyles.recentRide}>
+            <Image
+              source={icons.pin}
+              resizeMode="contain"
+              style={{ width: 20, height: 20 }}
+            />
+            <View>
+              <ThemedText style={{ fontSize: 16, fontWeight: "600" }}>{item.name}</ThemedText>
+              <ThemedText style={{ fontSize: 14, color: colors.textSecondary }}>{item.address}</ThemedText>
+            </View>
+          </ThemedView>
+        )}
+
+        // ------------- FOOTER -------------
+        ListFooterComponent={
+          <>
+            {/* Saved Places */}
+            <ThemedText style={[themedStyles.sectionTitle]}>Saved Places</ThemedText>
+
+            <View style={themedStyles.cardsRow}>
+              {renderCard("Home", "home")}
+              {renderCard("School", "school")}
+              {renderCard("Office", "office")}
+            </View>
+
+            <View style={themedStyles.cardsRow}>
+              {renderCard("Mall", "mall")}
+              {renderCard("Fun", "fun")}
+            </View>
+
+            <View style={themedStyles.cardsRow}>
+              <ThemedView style={[themedStyles.card]}>
+                <ThemedText style={[themedStyles.cardTitle]}>Add a new location</ThemedText>
               </ThemedView>
-            ))}
-            <ThemedView>
+            </View>
+          </>
+        }
+      />
 
-            </ThemedView>
-          </View>
-          {/* Your saved locations */}
-          <ThemedText style={[themedStyles.sectionTitle]}>Saved Places</ThemedText>
-                <View style={themedStyles.cardsRow}>
-                    {renderCard('Home', 'home')}
-                    {renderCard('School', 'school')}
-                    {renderCard('Office', 'office')}
-                </View>
-                <View style={themedStyles.cardsRow}>
-                    {renderCard('Mall', 'mall')}
-                    {renderCard('Fun', 'fun')}
-                </View>
-                <View style={themedStyles.cardsRow}>
-                    {renderCard('Add a new location', 'new')}
-                </View>
-      </ScrollView>
     </SafeAreaView>
   )
 }
@@ -143,11 +174,6 @@ const createStyles = (colors: ColorPalette) => StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 40,
-  },
-  userInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
   },
   userLogo: {
     width: 45,

@@ -141,13 +141,8 @@ const styles = (colors: ColorPalette) => StyleSheet.create({
     tripSummaryCard: {
         padding: 18,
         borderRadius: 12,
-        marginTop: 20,
+        marginTop: 10,
         marginBottom: 30,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 3,
     },
     summaryTitle: {
         fontSize: 18,

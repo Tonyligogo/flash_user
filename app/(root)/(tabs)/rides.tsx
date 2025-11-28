@@ -177,7 +177,7 @@ const styles = (colors: ColorPalette) => StyleSheet.create({
     fontSize: 28,
     fontWeight: 'bold',
     marginBottom: 20,
-    lineHeight:50
+    lineHeight:34
   },
   ridesListContainer: {
     gap: 15,

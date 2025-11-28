@@ -1,8 +1,11 @@
 import SupportLayout from '@/components/support-layout';
+import { ThemedText } from '@/components/themed-text';
+import { ThemedView } from '@/components/themed-view';
+import { Colors } from '@/constants/theme';
 import { useTheme } from '@/constants/ThemeContext';
 import { ColorPalette } from '@/types/type';
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, useColorScheme } from 'react-native';
 
 
 // --- ICON PLACEHOLDER ---
@@ -25,6 +28,8 @@ const legalLinks = [
 const LegalPrivacyScreen: React.FC = () => {
     const { colors } = useTheme();
     const themedStyles = styles(colors);
+    const colorScheme = useColorScheme();
+            const colorTheme = colorScheme === 'dark' ? 'dark' : 'light';
 
     const handlePress = (action: string) => {
         console.log(`Action initiated: ${action}. Opening document...`);
@@ -33,13 +38,14 @@ const LegalPrivacyScreen: React.FC = () => {
     const renderLink = (item: typeof legalLinks[0]) => (
         <TouchableOpacity 
             key={item.id}
-            style={[themedStyles.linkItem, { borderBottomColor: colors.border }]}
+            activeOpacity={0.8}
+            style={[themedStyles.linkItem, { borderBottomColor: Colors[colorTheme].textSecondary }]}
             onPress={() => handlePress(item.action)}
         >
-            <Text style={[themedStyles.linkText, { color: colors.textPrimary }]}>
+            <ThemedText style={[themedStyles.linkText]}>
                 {item.label}
-            </Text>
-            <Icon name="chevron-right" color={colors.textSecondary} size={16} />
+            </ThemedText>
+            <Icon name="chevron-right" color={Colors[colorTheme].text} size={16} />
         </TouchableOpacity>
     );
 
@@ -50,16 +56,16 @@ const LegalPrivacyScreen: React.FC = () => {
                 contentContainerStyle={themedStyles.contentContainer}
             >
                 {/* Description */}
-                <View style={[themedStyles.sectionContainer, { backgroundColor: colors.card, borderColor: colors.border }]}>
-                    <Text style={[themedStyles.descriptionText, { color: colors.textSecondary }]}>
+                <ThemedView style={[themedStyles.sectionContainer]}>
+                    <ThemedText style={[themedStyles.descriptionText]}>
                         This section contains all legal documentation, terms, and privacy policies governing your use of the Flash app.
-                    </Text>
-                </View>
+                    </ThemedText>
+                </ThemedView>
 
                 {/* Legal Links List */}
-                <View style={[themedStyles.listContainer, { backgroundColor: colors.card, borderColor: colors.border }]}>
+                <ThemedView style={[themedStyles.listContainer]}>
                     {legalLinks.map(renderLink)}
-                </View>
+                </ThemedView>
 
                 {/* App Version Info */}
                 <View style={themedStyles.versionContainer}>

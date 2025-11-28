@@ -1,0 +1,28 @@
+diff --git a/node_modules/react-native-google-places-textinput/src/GooglePlacesTextInput.tsx b/node_modules/react-native-google-places-textinput/src/GooglePlacesTextInput.tsx
+index 8c7fd26..2f25f68 100644
+--- a/node_modules/react-native-google-places-textinput/src/GooglePlacesTextInput.tsx
++++ b/node_modules/react-native-google-places-textinput/src/GooglePlacesTextInput.tsx
+@@ -546,13 +546,20 @@ const GooglePlacesTextInput = forwardRef<
+             suggestionPressing.current = false;
+             handleSuggestionPress(item);
+           }}
+-          // Fix for web: onBlur fires before onPress, hiding suggestions too early.
+-          {...(Platform.OS === 'web' &&
++          // Fix: onBlur fires before onPress, hiding suggestions too early.
++          {...(Platform.OS === 'web' ?
+             ({
+               onMouseDown: () => {
+                 suggestionPressing.current = true;
+               },
+-            } as any))}
++            } as any)
++            :
++            ({
++              onPressIn: () => {
++                suggestionPressing.current = true;
++              },
++            } as any)
++          )}
+         >
+           <Text
+             style={[
