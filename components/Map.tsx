@@ -1,10 +1,12 @@
 import { icons } from '@/constants';
+import { Colors } from '@/constants/theme';
 import { calculateRegion, generateMarkersFromData } from '@/lib/map';
 import { useDriverStore, useLocationStore } from '@/store';
 import { MarkerData } from '@/types/type';
 import React, { useEffect, useState } from 'react';
 import { useColorScheme } from 'react-native';
 import MapView, { Marker, PROVIDER_DEFAULT} from 'react-native-maps';
+import MapViewDirections from 'react-native-maps-directions';
 
 export default function Map() {
     const {
@@ -13,7 +15,7 @@ export default function Map() {
     const colorScheme = useColorScheme();
     const colorTheme = colorScheme === 'dark' ? 'dark' : 'light';
 
-    const {selectedDriver, setDrivers} = useDriverStore();
+    const {selectedDriver, drivers, setDrivers} = useDriverStore();
     const [markers, setMarkers] = useState<MarkerData[]>([]);
     const region = calculateRegion({
         userLatitude,
@@ -32,7 +34,7 @@ export default function Map() {
             });
             setMarkers(newMarkers);
         }
-    },[mockDrivers])
+    },[userLatitude,userLongitude])
   return (
       <MapView 
       provider={PROVIDER_DEFAULT} 
@@ -51,8 +53,30 @@ export default function Map() {
         image={
             selectedDriver === marker.id ? icons.selectedMarker : icons.marker
         }
-        ></Marker>
+        />
       ))}
+      {destinationLatitude && destinationLongitude && (
+        <>
+        <Marker
+            key="destination"
+            coordinate={{latitude:destinationLatitude, longitude:destinationLongitude}}
+            title='Destination'
+            image={icons.pin}
+        />
+        <MapViewDirections
+            origin={{
+                latitude:userLatitude!,
+                longitude:userLongitude!
+            }}
+            destination={{
+                latitude:destinationLatitude, longitude:destinationLongitude
+            }}
+            apikey={process.env.EXPO_PUBLIC_GOOGLE_API_KEY!}
+            strokeColor={Colors[colorTheme].primary}
+            strokeWidth={4}
+        />
+        </>
+      )}
       </MapView>
   );
 }

@@ -4,7 +4,6 @@ import { StatusBar } from 'expo-status-bar'
 import { StyleSheet, TouchableOpacity, View, Image } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { ThemedText } from './themed-text'
-import Map from './Map'
 
 const RideLayout = ({title,children}:{title:string, children:React.ReactNode}) => {
   return (
@@ -27,8 +26,6 @@ const RideLayout = ({title,children}:{title:string, children:React.ReactNode}) =
         </TouchableOpacity>
         {/*absolute content */}
         {children}
-        {/* map background */}
-        <Map/>
       </View>
     </SafeAreaView>
   )

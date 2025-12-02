@@ -36,11 +36,11 @@ const SearchInput = ({initialLocation, handleSearch}:{
       marginHorizontal: 0,
     },
     input: {
-      height: 60,
+      height: 50,
       backgroundColor:Colors[colorTheme].background,
       borderRadius: 200,
       color:Colors[colorTheme].text,
-      borderColor:Colors[colorTheme].background
+      borderColor:Colors[colorTheme].background,
     },
     suggestionsContainer: {
       backgroundColor: Colors[colorTheme].background,

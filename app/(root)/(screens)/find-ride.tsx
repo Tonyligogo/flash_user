@@ -1,21 +1,22 @@
+import RideSelection from '@/components/ride-selection';
 import RideLayout from '@/components/RideLayout';
 import SearchInput from '@/components/SearchInput';
 import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
 import { useLocationStore } from '@/store'
 import { StyleSheet, View } from 'react-native'
 
 const FindRide = () => {
   const {userAddress, destinationAddress, setUserLocation, setDestinationLocation } = useLocationStore();
-  console.log(userAddress)
   return (
     <RideLayout title="Ride">
     <View style={styles.locationSearch}>
+        <View style={styles.fromLocation}>
       <ThemedText>From</ThemedText>
       <SearchInput
       initialLocation={userAddress || ''}
         handleSearch={(location)=>setUserLocation(location)}
         />
+      </View>
       <ThemedText>To</ThemedText>
         
       <SearchInput
@@ -23,19 +24,9 @@ const FindRide = () => {
         handleSearch={(location)=>setDestinationLocation(location)}
       />
     </View>
-    <ThemedView style={styles.locationDetails}>
-      <ThemedText>From</ThemedText>
-      <SearchInput
-      initialLocation={userAddress || ''}
-        handleSearch={(location)=>setUserLocation(location)}
-        />
-      <ThemedText>To</ThemedText>
-        
-      <SearchInput
-        initialLocation={destinationAddress || ''}
-        handleSearch={(location)=>setDestinationLocation(location)}
-      />
-    </ThemedView>
+    <View style={styles.rideSelection}>
+    <RideSelection/>
+    </View>
     </RideLayout>
   )
 }
@@ -61,5 +52,22 @@ const styles = StyleSheet.create({
     zIndex:10,
     borderRadius:16,
     padding:16,
+  },
+  fromLocation:{
+    marginBottom:20
+  },
+  ridesContainer:{
+    flex:1,
+    padding:16,
+  },
+  ridesWrapper:{
+    borderTopLeftRadius:20,
+    borderTopRightRadius:20,
+  },
+  rideSelection:{
+    position:'absolute',
+    left:0,
+    right:0,
+    bottom:0,
   }
 })

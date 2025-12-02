@@ -184,6 +184,7 @@ const styles = (colors: ColorPalette) => StyleSheet.create({
     fontSize: 28,
     fontWeight: 'bold',
     marginBottom: 20,
+    lineHeight:40
   },
   
   userCard: {

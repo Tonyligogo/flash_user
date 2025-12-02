@@ -109,8 +109,8 @@ const themedStyles = StyleSheet.create({
         fontSize: 18,
       },
       detailTitle: {
-        fontSize: 26,
-        fontWeight: 'bold',
+        fontSize: 20,
+        fontWeight:'bold',
         marginBottom: 25,
       },
       detailSection: {

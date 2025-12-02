@@ -51,6 +51,7 @@ const Index = () => {
   }
 
   useEffect(()=>{
+    if(hasPermissions) return;
     const requestLocation = async()=>{
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
@@ -72,7 +73,7 @@ const Index = () => {
       });
     }
     requestLocation()
-  },[])
+  },[hasPermissions,setUserLocation])
 
   const renderCard = (title: string, iconName: string) => (
     <ThemedView style={[themedStyles.card]}>
@@ -158,7 +159,6 @@ const Index = () => {
           </>
         }
       />
-
     </SafeAreaView>
   )
 }
