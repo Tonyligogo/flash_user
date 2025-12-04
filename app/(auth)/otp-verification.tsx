@@ -1,20 +1,77 @@
+import { generateOtpApi, verifyPhoneOtpApi } from "@/api/auth.api";
 import CustomButton from "@/components/custom-button";
 import InputField from "@/components/input-field";
 import { ThemedText } from "@/components/themed-text";
-import {  images } from "@/constants";
+import { images } from "@/constants";
 import COLORS from "@/constants/Colors";
+import { Colors } from "@/constants/theme";
+import { clearRegistrationProgress, getRegistrationProgress, saveRegistrationProgress } from "@/store/registrationProgress";
+import { RegistrationProgress } from "@/types/type";
+import { useMutation } from "@tanstack/react-query";
 import { Link, router } from "expo-router";
-import { useState } from "react";
-import { Image, ScrollView, Text, View } from "react-native";
+import { useEffect, useState } from "react";
+import { Image, ScrollView, Text, TouchableWithoutFeedback, View } from "react-native";
 
 const OtpVerification = () => {
-  const [form, setForm] = useState({
-    otp: "",
+  const [phone, setPhone] = useState('');
+  const [otp, setOtp] = useState('');
+  const [step, setStep] = useState('phone_entry')
+  const [savedPhone, setSavedPhone] = useState<string | null>(null)
+  const registrationProgress = async()=>{
+    const progress = await getRegistrationProgress();
+    const phone = progress?.phone;
+    const step = phone ? 'otp_entry' : 'phone_entry';
+    setSavedPhone(phone ?? null)
+    setStep(step)
+  }
+  useEffect(()=>{
+    registrationProgress()
+  },[]);
+
+  const { mutate: sendPhoneOtp, isPending:sendingPhone } = useMutation({
+    mutationFn:generateOtpApi,
+    onSuccess:async()=>{
+      const progress: RegistrationProgress = {
+        step:"OTP_SUBMISSION",
+        phone
+      };
+      await saveRegistrationProgress(progress)
+      setStep('otp_entry')
+    }
+  });
+  const { mutate: verifyPhoneOtp, isPending:verifyingPhone } = useMutation({
+    mutationFn:verifyPhoneOtpApi,
+    onSuccess: async () => {
+      const progress: RegistrationProgress = {
+        step: "PROFILE_DETAILS",
+        phone,
+        phoneVerified: true,
+      };
+      await saveRegistrationProgress(progress);
+      router.replace("/sign-up");
+    }
   });
 
-  const onSignUpPress = () => {
-    router.push('/(root)/(tabs)')
+
+  const onSignUpPress = async() => {
+    if(step === 'phone_entry'){
+      if(!phone) return
+      const data = {phone}
+      sendPhoneOtp(data)
+    }else if(step === 'otp_entry'){
+      if(!savedPhone || !otp) return;
+      const data = {
+        code:otp,
+        phone:savedPhone
+      };
+      verifyPhoneOtp(data);
+    }
   };
+
+  const handleStartAfresh = async()=>{
+      await clearRegistrationProgress();
+  }
+
   return (
     <ScrollView style={{ flex: 1}}>
       <View style={{ flex: 1}}>
@@ -32,34 +89,50 @@ const OtpVerification = () => {
               left: 20,
             }}
           >
-            Verify OTP
+            Verify phone number
           </Text>
         </View>
-        <View style={{ paddingHorizontal: 20, paddingBlockEnd: 50 }}>
-         
-          <InputField
-            label="OTP"
-            placeholder="Enter your OTP"
-            value={form.otp}
-            onChangeText={(text) => setForm({ ...form, otp: text })}
+        <View style={{ paddingHorizontal: 20 }}>
+          {step === 'phone_entry' ?
+            <InputField
+            label="Phone number"
+            placeholder="Enter your phone number"
+            value={phone}
+            onChangeText={(text) => setPhone(text)}
+            keyboardType="phone-pad"
           />
+          :
+          <InputField
+            label="Verify OTP"
+            placeholder="Enter your OTP"
+            value={otp}
+            onChangeText={(text) => setOtp(text)}
+          />}
           <CustomButton
-            title="Verify"
+            title={step === 'phone_entry' ? 'Submit' : 'Verify'}
             onPress={onSignUpPress}
             className={{ paddingBlock: 16, marginBlockStart: 20 }}
+            isLoading={sendingPhone || verifyingPhone}
           />
-           <Link
+          {step === 'phone_entry' ? null :  <ThemedText style={{textAlign:'center', marginTop:12}}>We have sent an OTP to the number provided</ThemedText>}
+           {step === 'phone_entry' ? null :
+            <Link
                        href="/sign-up"
                        style={{
                          textAlign: "center",
-                         marginBlockStart: 8,
+                         marginTop: 8,
                          color: COLORS.textGray,
-                         fontSize: 18,
+                         fontSize: 14,
                        }}
                      >
                        <ThemedText>Not received? </ThemedText>
                        <ThemedText style={{ color: COLORS.primary }}>Resend it</ThemedText>
-                     </Link>
+                     </Link>}
+          {step === 'phone_entry' ? null : 
+          <TouchableWithoutFeedback onPress={handleStartAfresh}>
+            <ThemedText style={{color:Colors['dark'].primary}}>Start afresh</ThemedText>
+          </TouchableWithoutFeedback>
+          }
         </View>
       </View>
     </ScrollView>

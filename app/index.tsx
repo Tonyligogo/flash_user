@@ -1,10 +1,12 @@
+import LoadingScreen from "@/components/loading-screen";
+import { useAuth } from "@/providers/AuthProvider";
 import { Redirect } from "expo-router";
-import { useState } from "react"
 
 const Index = () => {
-    const [isLoggedIn] = useState<boolean>(true);
+    const {isAuthenticated, isLoading} = useAuth();
+    if(isLoading) return <LoadingScreen/>
   return (
-    <Redirect href={!isLoggedIn ? "/(auth)/welcome" : "/(root)/(tabs)"} />
+    <Redirect href={!isAuthenticated ? "/(auth)/welcome" : "/(root)/(tabs)"} />
   )
 }
 

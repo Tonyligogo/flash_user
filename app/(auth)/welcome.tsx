@@ -1,10 +1,10 @@
 import CustomButton from "@/components/custom-button";
 import { ThemedText } from "@/components/themed-text";
 import { onboarding } from "@/constants";
-import { router } from "expo-router"
+import { router } from "expo-router";
 import { useRef, useState } from "react";
-import { Image, TouchableOpacity, View } from "react-native"
-import { SafeAreaView } from "react-native-safe-area-context"
+import { Image, TouchableOpacity, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import Swiper from "react-native-swiper";
 
 const Onboarding = () => {
@@ -13,7 +13,7 @@ const Onboarding = () => {
   const isLastSlide = activeIndex === onboarding.length - 1;
     return (
       <SafeAreaView style={{ flex: 1, justifyContent: 'space-between', alignItems: 'center', paddingBottom:20 }}>
-        <TouchableOpacity onPress={()=>{router.replace('/(auth)/sign-up')}} style={{width:'100%', display:'flex', alignItems:'flex-end', padding: 20}}>
+        <TouchableOpacity onPress={()=>{router.replace('/(auth)/otp-verification')}} style={{width:'100%', display:'flex', alignItems:'flex-end', padding: 20}}>
           <ThemedText style={{fontWeight:800, fontSize:18}}>Skip</ThemedText>
         </TouchableOpacity>
         <Swiper 
@@ -41,7 +41,7 @@ const Onboarding = () => {
         </Swiper>
         <CustomButton
         title={isLastSlide ? 'Get Started' :'Next'}
-        onPress={()=> isLastSlide ? router.replace('/(auth)/sign-up') : swiperRef.current?.scrollBy(1)} 
+        onPress={()=> isLastSlide ? router.replace('/(auth)/otp-verification') : swiperRef.current?.scrollBy(1)} 
         className={{width:'90%'}}/>
       </SafeAreaView>
     )

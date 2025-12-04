@@ -54,7 +54,8 @@ export default {
           }
         }
       ],
-      "expo-web-browser"
+      "expo-web-browser",
+      "expo-secure-store"
     ],
 
     experiments: {
@@ -66,7 +67,8 @@ export default {
       router: {},
       eas: {
         projectId: "79e02f26-85c5-406e-a6b1-45a13fd5af1e"
-      }
+      },
+      API_URL: process.env.EXPO_PUBLIC_API_URL
     },
 
     owner: "ligogo",

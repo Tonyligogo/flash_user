@@ -199,3 +199,20 @@ export interface IconProps {
   size?: number;
   color: string;
 }
+
+export type RegistrationStep = 
+  | "OTP_SUBMISSION"
+  | "PROFILE_DETAILS"
+  | "EMAIL_OTP"
+  | "COMPLETED";
+
+export type RegistrationProgress = {
+  step: RegistrationStep;
+  phone: string;
+  first_name?: string;
+  surname?: string;
+  email?: string;
+  user_password?: string;
+  phoneVerified?: boolean;
+  emailVerified?: boolean;
+};

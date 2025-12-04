@@ -3,6 +3,7 @@ import InputField from "@/components/input-field";
 import { ThemedText } from "@/components/themed-text";
 import { icons, images } from "@/constants";
 import COLORS from "@/constants/Colors";
+import { useLogin } from "@/hooks/useAuthenticate";
 import { Link, router } from "expo-router";
 import { useState } from "react";
 import { Image, ScrollView, Text, View } from "react-native";
@@ -10,9 +11,16 @@ import { Image, ScrollView, Text, View } from "react-native";
 const SignIn = () => {
   const [form, setForm] = useState({
     email: "",
-    password: "",
+    user_password: "",
   });
+
+  const { mutate, isPending, isError } = useLogin();
+
   const onSignUpPress = () => {
+    mutate({
+      email:form.email,
+      user_password:form.user_password,
+    });
     router.push('/(auth)/otp-verification')
   };
   return (
@@ -49,13 +57,17 @@ const SignIn = () => {
             placeholder="Enter your password"
             icon={icons.lock}
             secureTextEntry={true}
-            value={form.password}
-            onChangeText={(text) => setForm({ ...form, password: text })}
+            value={form.user_password}
+            onChangeText={(text) => setForm({ ...form, user_password: text })}
           />
+          {isError ?
+           <Text style={{color:'red'}}>Login failed. Check your credentials</Text>
+           : null}
           <CustomButton
             title="Sign In"
             onPress={onSignUpPress}
             className={{ paddingBlock: 16, marginBlockStart: 20 }}
+            isLoading={isPending}
           />
           <Link
             href="/sign-up"

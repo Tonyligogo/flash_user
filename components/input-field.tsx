@@ -1,19 +1,20 @@
+import COLORS from "@/constants/Colors";
 import {
-    Image,
-    Keyboard,
-    KeyboardAvoidingView,
-    Platform,
-    Text,
-    TextInput,
-    TouchableWithoutFeedback,
-    View,
-    StyleProp,
-    ViewStyle,
-    TextStyle,
-    ImageStyle,
-    ImageSourcePropType,
-  } from "react-native";
-  import COLORS from "@/constants/Colors";
+  Image,
+  ImageSourcePropType,
+  ImageStyle,
+  Keyboard,
+  KeyboardAvoidingView,
+  KeyboardTypeOptions,
+  Platform,
+  StyleProp,
+  TextInput,
+  TextStyle,
+  TouchableWithoutFeedback,
+  useColorScheme,
+  View,
+  ViewStyle,
+} from "react-native";
 import { ThemedText } from "./themed-text";
 import { ThemedView } from "./themed-view";
   
@@ -29,6 +30,7 @@ import { ThemedView } from "./themed-view";
     iconStyle?: StyleProp<ImageStyle>;
     style?: StyleProp<ViewStyle>;
     value?: string; // Added for TextInput
+    keyboardType?:KeyboardTypeOptions;
     onChangeText?: (text: string) => void; // Added for TextInput
   }
   
@@ -44,8 +46,12 @@ import { ThemedView } from "./themed-view";
     iconStyle,
     style,
     value,
+    keyboardType,
     onChangeText,
-  }) => (
+  }) => {
+      const colorScheme = useColorScheme();
+  const colorTheme = colorScheme === 'dark' ? 'dark' : 'light';
+    return(
     <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={[{ marginVertical: 8, width: "100%" }, style]}>
@@ -55,17 +61,19 @@ import { ThemedView } from "./themed-view";
           >
             {icon && <Image source={icon} style={[{ width: 24, height: 24, marginLeft: 16 }, iconStyle]} />}
             <TextInput
-              style={[{ padding: 16, fontSize: 18, borderRadius: 50 }, inputStyle]}
+              style={[{ padding: 16, fontSize: 18, borderRadius: 50, color: colorTheme === 'dark' ? 'white':'black'}, inputStyle]}
               secureTextEntry={secureTextEntry}
               placeholder={placeholder}
               placeholderTextColor={COLORS.textGray}
               value={value}
               onChangeText={onChangeText}
+              keyboardType={keyboardType ?? 'default'}
             />
           </ThemedView>
         </View>
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
-  );
+    )
+  };
   
   export default InputField;
