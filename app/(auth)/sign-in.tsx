@@ -16,12 +16,15 @@ const SignIn = () => {
 
   const { mutate, isPending, isError } = useLogin();
 
-  const onSignUpPress = () => {
+  const onSignInPress = () => {
     mutate({
       email:form.email,
       user_password:form.user_password,
-    });
-    router.push('/(auth)/otp-verification')
+    },
+    {onSuccess:()=>{
+      router.push('/(root)/(tabs)');
+    }}
+  );
   };
   return (
     <ScrollView style={{ flex: 1}}>
@@ -50,7 +53,7 @@ const SignIn = () => {
             placeholder="Enter your email"
             icon={icons.email}
             value={form.email}
-            onChangeText={(text) => setForm({ ...form, email: text })}
+            handleChangeText={(text) => setForm({ ...form, email: text })}
           />
           <InputField
             label="Password"
@@ -58,14 +61,14 @@ const SignIn = () => {
             icon={icons.lock}
             secureTextEntry={true}
             value={form.user_password}
-            onChangeText={(text) => setForm({ ...form, user_password: text })}
+            handleChangeText={(text) => setForm({ ...form, user_password: text })}
           />
           {isError ?
            <Text style={{color:'red'}}>Login failed. Check your credentials</Text>
            : null}
           <CustomButton
             title="Sign In"
-            onPress={onSignUpPress}
+            onPress={onSignInPress}
             className={{ paddingBlock: 16, marginBlockStart: 20 }}
             isLoading={isPending}
           />

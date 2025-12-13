@@ -1,58 +1,78 @@
+import LoadingScreen from '@/components/loading-screen';
 import SupportLayout from '@/components/support-layout';
 import { ThemedText } from '@/components/themed-text';
 import { Colors } from '@/constants/theme';
 import { useTheme } from '@/constants/ThemeContext';
+import { useProfile, useUpdateProfile } from '@/hooks/useProfile';
 import { ColorPalette } from '@/types/type';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, useColorScheme } from 'react-native';
-
-// --- MOCK USER DATA ---
-const MOCK_USER = {
-    firstName: 'Flash',
-    lastName: 'User',
-    email: 'flash.user@example.com',
-    phone: '+254 712 345 678',
-};
 
 // --- MAIN COMPONENT ---
 const EditAccountInfoScreen: React.FC = () => {
+    const {data:user, isPending, isError} = useProfile();   
     const { colors } = useTheme();
     const themedStyles = createStyles(colors);
     const colorScheme = useColorScheme();
     const colorTheme = colorScheme === 'dark' ? 'dark' : 'light';
 
-    const [firstName, setFirstName] = useState(MOCK_USER.firstName);
-    const [lastName, setLastName] = useState(MOCK_USER.lastName);
-    const [email, setEmail] = useState(MOCK_USER.email);
-    const [phone, setPhone] = useState(MOCK_USER.phone);
-    const [isSaving, setIsSaving] = useState(false);
+    const [firstName, setFirstName] = useState(user?.first_name);
+    const [lastName, setLastName] = useState(user?.surname);
+    const [email, setEmail] = useState(user?.email);
+    const [phone, setPhone] = useState(user?.phone);
+    const [isSubmitDisabled, setIsSubmitDisabled] = useState(false);
+
+    const {mutate:updateProfile, isPending:isSaving} = useUpdateProfile();
+
+    useEffect(()=>{
+        if(user){
+            setFirstName(user?.first_name);
+            setLastName(user?.surname);
+            setEmail(user?.email);
+            setPhone(user?.phone);
+        }
+    },[user])
 
     // Check if any field has been modified
-    const isModified = 
-        firstName !== MOCK_USER.firstName ||
-        lastName !== MOCK_USER.lastName ||
-        email !== MOCK_USER.email ||
-        phone !== MOCK_USER.phone;
     
-    // Check if inputs are valid (simple check)
-    const isValid = firstName.length > 0 && lastName.length > 0 && email.includes('@');
-    const isSubmitDisabled = !isModified || !isValid || isSaving;
-
     const handleSave = async () => {
-        if (isSubmitDisabled) return;
+        const isModified = 
+        firstName !== user?.first_name ||
+        lastName !== user?.surname;
+        
+        // Check if inputs are valid (simple check)
+        const isValid = firstName?.length > 0 && lastName?.length > 0;
+        const isSubmitDisabled = !isModified || !isValid || isSaving;
+        if (isSubmitDisabled) {
+            setIsSubmitDisabled(true);
+            return;
+        };
+        const data = {
+            first_name: firstName,
+            surname: lastName,
+        }
+        updateProfile(data);
 
-        setIsSaving(true);
-        console.log('Saving updated account info:', { firstName, lastName, email, phone });
-        
-        await new Promise(resolve => setTimeout(resolve, 1500)); 
-        
-        setIsSaving(false);
-        console.log('Save successful!');
     };
+    if(isError){
+        return (
+            <SupportLayout title='Error Loading Profile'>
+            <View style={{gap:20, alignItems:'center'}}>
+                <ThemedText style={{fontSize:28, lineHeight:36}}>Sorry!</ThemedText>
+                <ThemedText style={{fontSize:18, textAlign:'center'}}>It seems like Flash had a problem getting your information.</ThemedText>
+                <ThemedText style={{fontSize:18}}>Please try again!</ThemedText>
+            </View>
+            </SupportLayout>
+        )
+    }
 
     return (
         <SupportLayout title="Edit Account Info">
-            <View style={themedStyles.contentContainer}>
+
+            {isPending ? 
+            <LoadingScreen/>
+            :
+                <View style={themedStyles.contentContainer}>
                 {/* Name Row */}
                     <View style={themedStyles.inputGroup}>
                         <ThemedText style={themedStyles.label}>First Name</ThemedText>
@@ -79,30 +99,27 @@ const EditAccountInfoScreen: React.FC = () => {
 
                 {/* Email Input */}
                 <View style={themedStyles.inputGroup}>
-                    <ThemedText style={themedStyles.label}>Email Address</ThemedText>
+                    <ThemedText style={themedStyles.label}>Email Address (Can not be changed)</ThemedText>
                     <TextInput
                         style={[themedStyles.input,{backgroundColor: Colors[colorTheme].background, color: Colors[colorTheme].text}]}
                         placeholderTextColor={Colors[colorTheme].textSecondary}
                         value={email}
-                        onChangeText={setEmail}
                         placeholder="Email Address"
-                        keyboardType="email-address"
-                        autoCapitalize="none"
-                        editable={!isSaving}
+                        aria-disabled={true}
+                        editable={false}
                     />
                 </View>
 
                 {/* Phone Input */}
                 <View style={themedStyles.inputGroup}>
-                    <ThemedText style={themedStyles.label}>Phone Number</ThemedText>
+                    <ThemedText style={themedStyles.label}>Phone Number (Can not be changed)</ThemedText>
                     <TextInput
                         style={[themedStyles.input,{backgroundColor: Colors[colorTheme].background, color: Colors[colorTheme].text}]}
                         placeholderTextColor={Colors[colorTheme].textSecondary}
                         value={phone}
-                        onChangeText={setPhone}
-                        placeholder="Phone Number"
-                        keyboardType="phone-pad"
-                        editable={!isSaving}
+                        placeholder='Phone Number'
+                        aria-disabled={true}
+                        editable={false}
                     />
                 </View>
 
@@ -120,7 +137,7 @@ const EditAccountInfoScreen: React.FC = () => {
                     </Text>
                 </TouchableOpacity>
 
-            </View>
+            </View>}
         </SupportLayout>
     );
 };

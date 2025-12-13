@@ -1,4 +1,4 @@
-import { generateOtpApi, loginApi, registerApi } from "@/api/auth.api";
+import { loginApi, logoutApi, verifyEmailOtpApi } from "@/api/auth.api";
 import { useAuth } from "@/providers/AuthProvider";
 import { useMutation } from "@tanstack/react-query";
 import { router } from "expo-router";
@@ -9,37 +9,35 @@ export const useLogin = () => {
   return useMutation({
     mutationFn: loginApi,
     onSuccess: async (data) => {
-      await login(data.token, data.user);
+      const user = {
+        first_name: data.user.first_name,
+        last_name: data.user.surname,
+        email: data.user.email,
+        phone: data.user.phone,
+        id: data.user.user_id,
+      }
+      await login(data.accessToken, user);
     },
   });
 };
 
-export const useGenerateOtp = () => {
+
+export const useEmailVerification = () => {
   return useMutation({
-    mutationFn: generateOtpApi,
-  });
-};
+    mutationFn:verifyEmailOtpApi,
+    onSuccess:()=>{
+      router.replace("/(root)/(tabs)")
+    }
+  })
+}
 
-export const useRegister = () => {
-  const otpMutation = useGenerateOtp();
-
+export const useLogout = ()=>{
+  const { logout } = useAuth();
   return useMutation({
-    mutationFn: registerApi,
-
-    onSuccess: (data) => {
-      const phone = data.user.phone;
-
-      otpMutation.mutate(
-        { phone },
-        {
-          onSuccess: () => {
-            router.replace({
-              pathname: "/otp-verification",
-              params: { phone },
-            });
-          },
-        }
-      );
-    },
-  });
-};
+    mutationFn:logoutApi,
+    onSuccess: async () => {
+      await logout();
+      router.replace("/(auth)/sign-in");
+    }
+  })
+}

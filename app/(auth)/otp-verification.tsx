@@ -21,6 +21,9 @@ const OtpVerification = () => {
     const progress = await getRegistrationProgress();
     const phone = progress?.phone;
     const step = phone ? 'otp_entry' : 'phone_entry';
+    if(phone){
+      return router.replace("/sign-up");
+    }
     setSavedPhone(phone ?? null)
     setStep(step)
   }
@@ -28,7 +31,7 @@ const OtpVerification = () => {
     registrationProgress()
   },[]);
 
-  const { mutate: sendPhoneOtp, isPending:sendingPhone } = useMutation({
+  const { mutate: sendPhoneOtp, isPending:sendingPhone, isError, error } = useMutation({
     mutationFn:generateOtpApi,
     onSuccess:async()=>{
       const progress: RegistrationProgress = {
@@ -98,7 +101,7 @@ const OtpVerification = () => {
             label="Phone number"
             placeholder="Enter your phone number"
             value={phone}
-            onChangeText={(text) => setPhone(text)}
+            handleChangeText={(text) => setPhone(text)}
             keyboardType="phone-pad"
           />
           :
@@ -106,8 +109,9 @@ const OtpVerification = () => {
             label="Verify OTP"
             placeholder="Enter your OTP"
             value={otp}
-            onChangeText={(text) => setOtp(text)}
+            handleChangeText={(text) => setOtp(text)}
           />}
+          {isError ? <ThemedText>{step}-{error.message}</ThemedText> : null}
           <CustomButton
             title={step === 'phone_entry' ? 'Submit' : 'Verify'}
             onPress={onSignUpPress}
@@ -130,7 +134,7 @@ const OtpVerification = () => {
                      </Link>}
           {step === 'phone_entry' ? null : 
           <TouchableWithoutFeedback onPress={handleStartAfresh}>
-            <ThemedText style={{color:Colors['dark'].primary}}>Start afresh</ThemedText>
+            <ThemedText style={{color:Colors['dark'].primary, textAlign:'center', marginTop:8}}>Start afresh</ThemedText>
           </TouchableWithoutFeedback>
           }
         </View>
