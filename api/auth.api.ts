@@ -34,3 +34,18 @@ export const verifyPhoneOtpApi = async (payload: {
   const res = await api.post("/api/user/phone-otp-verification", payload);
   return res.data;
 };
+
+// OTP generation
+export const verifyEmailOtpApi = async (payload: {
+  activation_token: string;
+  activation_code:string
+}) => {
+  const res = await api.post("/api/user/account-creation", payload);
+  return res.data;
+};
+
+// log out
+export const logoutApi = async () => {
+  const res = await api.get("/api/user/logout");
+  return res;
+}

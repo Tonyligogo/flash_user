@@ -208,11 +208,8 @@ export type RegistrationStep =
 
 export type RegistrationProgress = {
   step: RegistrationStep;
-  phone: string;
-  first_name?: string;
-  surname?: string;
-  email?: string;
-  user_password?: string;
+  phone?: string;
+  activation_token?: string;
   phoneVerified?: boolean;
   emailVerified?: boolean;
 };

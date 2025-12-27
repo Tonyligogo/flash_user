@@ -1,11 +1,14 @@
+import { registerApi } from "@/api/auth.api";
 import CustomButton from "@/components/custom-button";
 import InputField from "@/components/input-field";
 import { icons, images } from "@/constants";
 import COLORS from "@/constants/Colors";
-import { useRegister } from "@/hooks/useAuthenticate";
-import { Link } from "expo-router";
+import { getRegistrationProgress, saveRegistrationProgress } from "@/store/registrationProgress";
+import { RegistrationProgress } from "@/types/type";
+import { useMutation } from "@tanstack/react-query";
+import { Link, router } from "expo-router";
 import { useState } from "react";
-import { Image, ScrollView, Text, View } from "react-native";
+import { Image, KeyboardAvoidingView, Platform, ScrollView, Text, View } from "react-native";
 
 const SignUp = () => {
   const [form, setForm] = useState({
@@ -14,27 +17,49 @@ const SignUp = () => {
     email: "",
     password: "",
     confirmPassword: "",
-    phone:""
   });
   const [error, setError] = useState('')
-  const { mutate, isPending, isError } = useRegister();
-  const onSignUpPress = () => {
+  const { mutate, isPending, isError, error:registrationError } = useMutation({
+    mutationFn:registerApi,
+    onSuccess:async(data)=>{
+      const existingProgress = await getRegistrationProgress();
+
+    if (!existingProgress) return router.replace("/(auth)/otp-verification");
+
+    const updatedProgress: RegistrationProgress = {
+      ...existingProgress,
+      step: "EMAIL_OTP",
+      activation_token: data.activationToken,
+    };
+    await saveRegistrationProgress(updatedProgress)
+      router.replace("/(auth)/email-otp");
+    }
+  });
+
+  const onSignUpPress = async() => {
     if (form.password !== form.confirmPassword) {
-    setError("Passwords do not match");
-    return;
-  }
+      setError("Passwords do not match");
+      return;
+    }
+    const progress = await getRegistrationProgress();
+    const phone = progress?.phone;
+    if(!phone) return setError("Phone number not verified")
   const data = {
     first_name:form.name,
     surname:form.surname,
     email:form.email,
     user_password:form.password,
-    phone:form.phone
+    phone
   }
-    mutate(data)
+  mutate(data)
   };
   return (
+    <KeyboardAvoidingView
+    behavior={Platform.OS === "ios" ? "padding" : "height"}
+    style={{ flex: 1 }}
+  >
     <ScrollView style={{ flex: 1 }}>
-      <View style={{ flex: 1 }}>
+      <View style={{ flex: 1, paddingBottom:20 }}>
         <View style={{ position: "relative", width: "100%", height: 250 }}>
           <Image
             source={images.signUpCar}
@@ -58,29 +83,22 @@ const SignUp = () => {
             placeholder="Enter your name"
             icon={icons.person}
             value={form.name}
-            onChangeText={(text) => setForm({ ...form, name: text })}
+            handleChangeText={(text) => setForm(prev => ({ ...prev, name: text }))}
           />
           <InputField
             label="Last name"
             placeholder="Enter your surname"
             icon={icons.person}
             value={form.surname}
-            onChangeText={(text) => setForm({ ...form, surname: text })}
+            handleChangeText={(text) => setForm(prev => ({ ...prev, surname: text }))}
           />
           <InputField
             label="Email"
             placeholder="Enter your email"
             icon={icons.email}
             value={form.email}
-            onChangeText={(text) => setForm({ ...form, email: text })}
+            handleChangeText={(text) => setForm(prev => ({ ...prev, email: text }))}
             keyboardType="email-address"
-          />
-          <InputField
-            label="Phone number"
-            placeholder="Enter your phone number"
-            value={form.phone}
-            onChangeText={(text) => setForm({ ...form, phone: text })}
-            keyboardType="phone-pad"
           />
           <InputField
             label="Password"
@@ -88,7 +106,7 @@ const SignUp = () => {
             icon={icons.lock}
             secureTextEntry={true}
             value={form.password}
-            onChangeText={(text) => setForm({ ...form, password: text })}
+            handleChangeText={(text) => setForm(prev => ({ ...prev, password: text }))}
           />
           <InputField
             label="Confirm Password"
@@ -96,10 +114,10 @@ const SignUp = () => {
             icon={icons.lock}
             secureTextEntry={true}
             value={form.confirmPassword}
-            onChangeText={(text) => setForm({ ...form, confirmPassword: text })}
+            handleChangeText={(text) => setForm(prev => ({ ...prev, confirmPassword: text }))}
           />
           {isError ?
-           <Text style={{color:'red'}}>Login failed. Check your credentials</Text>
+           <Text style={{color:'red'}}>{registrationError.message}</Text>
            : null}
           {error ?
            <Text style={{color:'red'}}>{error}</Text>
@@ -125,6 +143,7 @@ const SignUp = () => {
         </View>
       </View>
     </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 

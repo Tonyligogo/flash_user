@@ -2,25 +2,20 @@ import React from 'react';
 import {
   View,
   Text,
-  Image,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
   useColorScheme,
 } from 'react-native';
 
-import { MenuItem, MenuSection, IconProps, UserProfile, ColorPalette } from '@/types/type'; 
+import { MenuItem, MenuSection, IconProps, ColorPalette } from '@/types/type'; 
 import { useTheme } from '@/constants/ThemeContext';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Colors } from '@/constants/theme';
-
-const user: UserProfile = {
-  name: 'Flash User',
-  profilePic: 'https://i.pravatar.cc/100?img=68', 
-};
+import LogoutButton from '@/components/logout-button';
 
 // Mock data for menu items
 const menuSections: MenuSection[] = [
@@ -139,29 +134,14 @@ const Profile: React.FC = () => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={themedStyles.contentContainer}
       >
-        <ThemedText style={[themedStyles.pageTitle]}>Profile</ThemedText>
-
-        {/* 1. User Header Card */}
-        <ThemedView style={[themedStyles.userCard]}>
-          <Image 
-            source={{ uri: user.profilePic }} 
-            style={themedStyles.profileImage}
-          />
-            <ThemedText style={[themedStyles.userName]}>{user.name}</ThemedText>
-        </ThemedView>
+        <ThemedText style={[themedStyles.pageTitle]}>Settings</ThemedText>
 
         {/* 2. Menu Sections */}
         {menuSections.map(renderMenuSection)}
 
         {/* 3. Footer / Logout */}
         <View style={themedStyles.logoutContainer}>
-            <TouchableOpacity 
-                style={[themedStyles.logoutButton, { borderColor: colors.border }]} 
-                onPress={() => handlePress('logout')}
-                activeOpacity={0.8}
-            >
-                <ThemedText style={[themedStyles.logoutText]}>Sign Out</ThemedText>
-            </TouchableOpacity>
+            <LogoutButton/>
             <Text style={[themedStyles.appVersion, { color: colors.textSecondary }]}>
               App by Corban Technologies
             </Text>
@@ -177,13 +157,14 @@ const styles = (colors: ColorPalette) => StyleSheet.create({
     flex: 1,
   },
   contentContainer: {
-    paddingVertical:30,
+    paddingVertical:20,
     paddingHorizontal: 16,
   },
   pageTitle: {
     fontSize: 28,
+    textAlign:'center',
     fontWeight: 'bold',
-    marginBottom: 20,
+    marginBottom: 40,
     lineHeight:40
   },
   
@@ -261,6 +242,7 @@ const styles = (colors: ColorPalette) => StyleSheet.create({
   // --- Footer Styles ---
   logoutContainer: {
       marginTop: 30,
+      gap:10,
       alignItems: 'center',
   },
   logoutButton: {

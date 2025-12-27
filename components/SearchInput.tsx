@@ -73,6 +73,13 @@ const SearchInput = ({initialLocation, handleSearch}:{
       onPlaceSelect={handlePlaceSelect}
       style={customStyles}
       languageCode="en"
+      // this bounds the search to kenya - these are coordinates for a reactangle around kenya
+      locationRestriction={{
+        rectangle: {
+            low: { latitude: -4.5, longitude: 34 }, // South and West bounds
+            high: { latitude: 4.5, longitude: 42 }  // North and East bounds
+        }
+      }}
       // min characters before triggering search
       minCharsToFetch={4}
       // delay in milliseconds before triggering search
